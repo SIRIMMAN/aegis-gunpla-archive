@@ -1,54 +1,212 @@
-<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AEGIS Gunpla Archive</title>
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AEGIS // Gunpla Archive</title>
 <style>
-:root{--bg:#09111b;--p:#132235;--line:#29465e;--t:#eaf3fa;--m:#91a8ba;--c:#42d7e8;--g:#e7c274}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#18354b,transparent 42%),var(--bg);color:var(--t);font:15px system-ui}header,main{max-width:1100px;margin:auto;padding:22px 17px}header{border-bottom:1px solid var(--line)}h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:2px}header p,.muted,small{color:var(--m)}header p{margin:4px 0;font-size:11px;letter-spacing:2px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}.stat,.card,.panel{background:linear-gradient(145deg,var(--p),#0e1927);border:1px solid var(--line);border-radius:10px;padding:15px}.stat small{display:block;text-transform:uppercase;font-size:10px;letter-spacing:1px}.stat strong{font-size:25px}.toolbar{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap}input,select,textarea{background:#081522;color:var(--t);border:1px solid #35536a;border-radius:6px;padding:10px;font:inherit}#search{flex:1;min-width:170px}button{background:#17415b;color:var(--t);border:1px solid #39728c;border-radius:6px;padding:9px 13px;font-weight:700;cursor:pointer}.primary{background:#087e9c;border-color:var(--c)}.danger{background:#40232b;border-color:#874b55}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.card{padding:0;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:.18s}.card:hover{border-color:var(--c);transform:translateY(-2px)}.thumb{height:165px;background:linear-gradient(135deg,#142b40,#081522);display:flex;align-items:center;justify-content:center;overflow:hidden;color:#7f9db3;font-size:12px;text-align:center;padding:10px}.thumb img{width:100%;height:100%;object-fit:contain}.detailimg{width:100%;height:260px;object-fit:contain;background:#081522;border:1px solid var(--line);border-radius:8px}.detailgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.detailgrid div{background:#0a1826;border:1px solid var(--line);padding:10px;border-radius:7px}.detailgrid small{display:block;color:var(--m);font-size:10px;text-transform:uppercase}.detailgrid b{display:block;margin-top:4px}.cardhead{padding:14px 14px 5px;display:flex;justify-content:space-between;gap:8px}.code{font-size:10px;color:var(--c);letter-spacing:1px}.card h3{font-size:16px;margin:5px 0}.body{padding:0 14px 12px;flex:1}.price{font-size:19px;color:var(--g);font-weight:800;margin-top:8px}.tag{font-size:10px;border:1px solid #45657d;border-radius:4px;padding:4px 6px;white-space:nowrap;height:max-content}.backlog{color:#f3d28b}.shipping{color:#8edcff}.completed{color:#8ce1b2}.wishlist{color:#d6b5ff}.actions{padding:0 14px 13px;display:flex;gap:7px}.actions button{font-size:11px;padding:6px 9px}.modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:14px}.modal.open{display:flex}.dialog{background:#102033;border:1px solid #42647e;border-radius:12px;padding:19px;width:min(550px,100%);max-height:94vh;overflow:auto}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:4px}.field label{font-size:11px;color:var(--m)}.field input,.field select,.field textarea{width:100%}.wide{grid-column:1/-1}.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.empty{padding:25px;text-align:center;color:var(--m);border:1px dashed var(--line);grid-column:1/-1}.note{margin-top:20px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--m)}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}.wide{grid-column:auto}}
-</style></head><body>
-<header><h1>AEGIS // GUNPLA ARCHIVE</h1><p>PERSONAL MOBILE SUIT DATABASE · COLLECTION COMMAND</p></header>
-<main><div class="top"><div><b style="color:var(--c);letter-spacing:2px">COLLECTION CONTROL</b><div class="muted">Urus koleksi, backlog, pembelian dan wishlist.</div></div><button class="primary" onclick="openForm()">＋ ADD MOBILE SUIT</button></div>
-<div class="stats"><div class="stat"><small>Total rekod</small><strong id="total">7</strong></div><div class="stat"><small>Backlog</small><strong id="backlog">4</strong></div><div class="stat"><small>Dalam perjalanan</small><strong id="shipping">2</strong></div><div class="stat"><small>Belanja diketahui</small><strong id="spent">RM315+</strong></div></div>
-<div class="toolbar"><input id="search" placeholder="Cari model / jenama..." oninput="render()"><select id="filter" onchange="render()"><option value="all">Semua status</option><option value="backlog">Backlog</option><option value="shipping">Dalam perjalanan</option><option value="completed">Siap</option><option value="wishlist">Wishlist</option></select><select id="sort" onchange="render()"><option value="name">Susun nama</option><option value="price">Harga rendah dahulu</option></select></div>
-<div class="top"><h3>ACTIVE COLLECTION</h3><small id="count"></small></div><div class="grid" id="cards"></div>
-<div class="panel" style="margin-top:18px"><b>Nota rekod</b><p class="muted" style="font-size:13px">Harga Dragon Tiger Model GK Nu Gundam Fukuoka belum diketahui. Azure Falcon direkodkan RM160+. Eternal Darkness Eclipse sudah siap dipasang dan decal; harga belum diberikan.</p></div>
-<div class="note">Data disimpan dalam browser/peranti ini (local storage). Gunakan Export JSON untuk backup jika mahu berpindah peranti.</div><div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"><button onclick="resetData()">Reset asal</button></div>
+:root{--bg:#09111b;--p:#132235;--line:#29465e;--t:#eaf3fa;--m:#91a8ba;--c:#42d7e8;--g:#e7c274}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#18354b,transparent 42%),var(--bg);color:var(--t);font:15px system-ui}
+header,main{max-width:1120px;margin:auto;padding:22px 17px}header{border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:2px}header p,.muted,small{color:var(--m)}header p{margin:4px 0;font-size:11px;letter-spacing:2px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}
+.stat,.card,.panel{background:linear-gradient(145deg,var(--p),#0e1927);border:1px solid var(--line);border-radius:10px;padding:15px}
+.stat small{display:block;text-transform:uppercase;font-size:10px;letter-spacing:1px}.stat strong{font-size:25px}
+.toolbar{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap}
+input,select,textarea{background:#081522;color:var(--t);border:1px solid #35536a;border-radius:6px;padding:10px;font:inherit;max-width:100%}
+input{width:100%}#search{flex:1;min-width:170px}
+button{background:#17415b;color:var(--t);border:1px solid #39728c;border-radius:6px;padding:9px 13px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border-color:var(--c)}.danger{background:#40232b;border-color:#874b55}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{padding:0;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:.18s}.card:hover{border-color:var(--c);transform:translateY(-2px)}
+.thumb{height:165px;background:linear-gradient(135deg,#142b40,#081522);display:flex;align-items:center;justify-content:center;overflow:hidden;color:#7f9db3;font-size:12px;text-align:center;padding:10px}
+.thumb img{width:100%;height:100%;object-fit:contain}.detailimg{width:100%;height:260px;object-fit:contain;background:#081522;border:1px solid var(--line);border-radius:8px}
+.detailgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.detailgrid div{background:#0a1826;border:1px solid var(--line);padding:10px;border-radius:7px}
+.detailgrid small{display:block;color:var(--m);font-size:10px;text-transform:uppercase}.detailgrid b{display:block;margin-top:4px}
+.cardhead{padding:14px 14px 5px;display:flex;justify-content:space-between;gap:8px}.code{font-size:10px;color:var(--c);letter-spacing:1px}
+.card h3{font-size:16px;margin:5px 0}.body{padding:0 14px 12px;flex:1}.price{font-size:19px;color:var(--g);font-weight:800;margin-top:8px}
+.tag{font-size:10px;border:1px solid #45657d;border-radius:4px;padding:4px 6px;white-space:nowrap;height:max-content}
+.backlog{color:#f3d28b}.shipping{color:#8edcff}.completed{color:#8ce1b2}.wishlist{color:#d6b5ff}
+.actions{padding:0 14px 13px;display:flex;gap:7px}.actions button{font-size:11px;padding:6px 9px}
+.modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:15px;z-index:5;overflow:auto}.modal.open{display:flex}
+.dialog{background:#102033;border:1px solid var(--line);border-radius:12px;padding:20px;width:min(650px,100%);max-height:92vh;overflow:auto}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px}.wide{grid-column:1/-1}label{font-size:11px;color:var(--m)}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:15px;flex-wrap:wrap}.note{font-size:11px;color:var(--m);margin:15px 0}
+.authwrap{max-width:560px;margin:25px auto}.authwrap .panel{padding:22px}.authgrid{display:grid;gap:12px}.statusline{font-size:12px;color:var(--m);margin:8px 0}.hidden{display:none!important}
+.badge{display:inline-block;border:1px solid #42627a;border-radius:99px;padding:4px 9px;font-size:11px;color:#b7d9e8}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.wide{grid-column:auto}header,main{padding:16px 12px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>AEGIS // GUNPLA ARCHIVE</h1><p>COLLECTION DATABASE · BACKLOG CONTROL · ONLINE SYNC</p></div><div class="top"><span id="connectionBadge" class="badge">Belum disambungkan</span><button id="logoutBtn" class="hidden" onclick="logout()">Log keluar</button></div></div></header>
+
+<main>
+<section id="setup" class="authwrap">
+ <div class="panel">
+  <h2>Sambungkan Supabase</h2>
+  <p class="muted">Masukkan Project URL dan Publishable Key. Maklumat ini disimpan dalam browser ini sahaja. Pada peranti lain, buat konfigurasi sekali lagi.</p>
+  <div class="authgrid">
+   <div class="field"><label>SUPABASE PROJECT URL</label><input id="projectUrl" placeholder="https://your-project.supabase.co"></div>
+   <div class="field"><label>SUPABASE PUBLISHABLE KEY</label><input id="publishableKey" placeholder="sb_publishable_..." autocomplete="off"></div>
+   <button class="primary" onclick="connectSupabase()">Simpan & Sambung</button>
+   <div class="statusline" id="setupStatus">Gunakan publishable key sahaja. Jangan masukkan secret/service_role key.</div>
+  </div>
+ </div>
+</section>
+
+<section id="auth" class="authwrap hidden">
+ <div class="panel">
+  <h2 id="authTitle">Log masuk AEGIS</h2>
+  <p class="muted">Log masuk untuk mengakses koleksi Gunpla peribadi kau.</p>
+  <div class="authgrid">
+   <div class="field"><label>EMAIL</label><input id="authEmail" type="email" autocomplete="email" placeholder="email@example.com"></div>
+   <div class="field"><label>PASSWORD</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Password"></div>
+   <button class="primary" id="authSubmit" onclick="signIn()">Log masuk</button>
+   <button id="signupBtn" onclick="signUp()">Daftar akaun baharu</button>
+   <button onclick="changeConfig()">Tukar konfigurasi Supabase</button>
+   <div class="statusline" id="authStatus">Jika baru daftar, semak email untuk pengesahan jika diminta.</div>
+  </div>
+ </div>
+</section>
+
+<section id="app" class="hidden">
+ <div class="top"><div><h2>COMMAND CENTER</h2><small id="signedInAs"></small></div><div class="toolbar"><button class="primary" onclick="openForm()">+ Tambah Gundam</button><button onclick="syncNow()">Sync</button></div></div>
+ <div class="stats">
+  <div class="stat"><small>Jumlah koleksi</small><strong id="total">0</strong></div>
+  <div class="stat"><small>Backlog</small><strong id="backlog">0</strong></div>
+  <div class="stat"><small>Dalam perjalanan</small><strong id="shipping">0</strong></div>
+  <div class="stat"><small>Belanja diketahui</small><strong id="spent">RM0</strong></div>
+ </div>
+ <div class="toolbar">
+  <input id="search" placeholder="Cari model / grade / jenama..." oninput="render()">
+  <select id="filter" onchange="render()"><option value="all">Semua status</option><option value="Backlog">Backlog</option><option value="Shipping">Dalam perjalanan</option><option value="Completed">Siap</option><option value="Wishlist">Wishlist</option></select>
+  <select id="gradeFilter" onchange="render()"><option value="all">Semua grade</option></select>
+  <select id="sort" onchange="render()"><option value="name">Susun nama</option><option value="price">Harga rendah dahulu</option></select>
+ </div>
+ <div class="top"><h3>ACTIVE COLLECTION</h3><small id="count"></small></div>
+ <div class="grid" id="cards"></div>
+ <div class="panel" style="margin-top:18px"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p></div>
+ <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
+</section>
 </main>
-<div class="modal" id="modal"><div class="dialog"><h2 id="heading">Tambah model</h2><form id="f" onsubmit="save(event)"><input type="hidden" id="id"><div class="form">
-<div class="field wide"><label>NAMA MODEL *</label><input id="name" required></div><div class="field"><label>JENAMA</label><input id="brand"></div><div class="field"><label>SKALA / JENIS</label><input id="scale"></div><div class="field"><label>HARGA (RM)</label><input id="price" type="number" min="0" step=".01"></div><div class="field"><label>CATATAN HARGA</label><select id="priceNote"><option value="">Harga tepat</option><option value="plus">Anggaran / RM160+</option><option value="unknown">Belum diketahui</option></select></div><div class="field"><label>STATUS</label><select id="status"><option value="backlog">Backlog</option><option value="shipping">Dalam perjalanan</option><option value="completed">Siap</option><option value="wishlist">Wishlist</option></select></div><div class="field"><label>KEDAI / SUMBER</label><input id="source"></div><div class="field wide"><label>PAUTAN GAMBAR (URL imej)</label><input id="image" type="url" placeholder="https://...jpg atau .png"></div><div class="field wide"><label>NOTA</label><textarea id="notes" rows="2"></textarea></div></div><div class="foot"><button type="button" onclick="closeForm()">Batal</button><button class="primary">Simpan</button></div></form></div></div>
+
+<div class="modal" id="modal"><div class="dialog"><div class="top"><h2 id="heading">Tambah model</h2><button onclick="closeForm()">✕</button></div>
+<form id="f" onsubmit="saveRecord(event)"><input type="hidden" id="recordId">
+<div class="form">
+ <div class="field wide"><label>NAMA MODEL *</label><input id="name" required></div>
+ <div class="field"><label>GRADE / SERIES</label><select id="grade"><option>Unclassified</option><option>SD</option><option>SDCS</option><option>SDEX</option><option>MGSD</option><option>HG</option><option>RG</option><option>MG</option><option>MG Ver.Ka</option><option>FM</option><option>PG</option><option>PGU</option><option>Mega Size</option><option>RE/100</option><option>Other</option></select></div>
+ <div class="field"><label>SCALE</label><select id="scale"><option>Non-scale</option><option>1/144</option><option>1/100</option><option>1/60</option><option>1/48</option><option>1/35</option><option>Other</option></select></div>
+ <div class="field"><label>MANUFACTURER</label><select id="manufacturer"><option>Bandai</option><option>IN ERA+</option><option>Dragon Tiger Model</option><option>Other Third-party</option><option>Other</option></select></div>
+ <div class="field"><label>STATUS</label><select id="status"><option>Backlog</option><option>Shipping</option><option>Completed</option><option>Wishlist</option></select></div>
+ <div class="field"><label>HARGA (RM)</label><input id="price" type="number" min="0" step=".01"></div>
+ <div class="field"><label>CATATAN HARGA</label><select id="priceNote"><option value="exact">Harga tepat</option><option value="plus">Anggaran / RM160+</option><option value="unknown">Belum diketahui</option></select></div>
+ <div class="field"><label>TARIKH PEMBELIAN</label><input id="purchaseDate" type="date"></div>
+ <div class="field"><label>KEDAI / SUMBER</label><input id="source"></div>
+ <div class="field wide"><label>PAUTAN GAMBAR (URL IMEJ)</label><input id="imageUrl" type="url" placeholder="https://...jpg atau .png"></div>
+ <div class="field wide"><label>NOTA</label><textarea id="notes" rows="2"></textarea></div>
+</div><div class="foot"><button type="button" onclick="closeForm()">Batal</button><button class="primary" id="saveBtn">Simpan ke database</button></div></form>
+</div></div>
+
+<div class="modal" id="detailModal" onclick="if(event.target===this)closeDetail()"><div class="dialog">
+ <div class="top"><h2 id="dname">Butiran Gundam</h2><button onclick="closeDetail()">✕</button></div>
+ <img id="dimage" class="detailimg hidden" alt="Gambar model Gundam"><div id="dplaceholder" class="thumb" style="height:220px;border-radius:8px">GAMBAR BELUM DITAMBAH</div>
+ <div class="detailgrid" style="margin-top:12px"><div><small>Grade</small><b id="dgrade"></b></div><div><small>Scale</small><b id="dscale"></b></div><div><small>Manufacturer</small><b id="dmanufacturer"></b></div><div><small>Status</small><b id="dstatus"></b></div><div><small>Harga</small><b id="dprice"></b></div><div><small>Kedai / Sumber</small><b id="dsource"></b></div></div>
+ <p id="dnotes" class="muted"></p><div class="foot"><button onclick="searchImage()">Cari gambar</button><button class="primary" onclick="editFromDetail()">Edit rekod</button><button class="danger" onclick="deleteFromDetail()">Padam</button></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const seed=[
-{id:1,name:"Eternal Darkness Eclipse",brand:"Third-party",scale:"Model kit",price:null,priceNote:"unknown",status:"completed",source:"",notes:"Siap dipasang dan decal. Kemasan hitam matte dengan metallic gold."},
-{id:2,name:"MGSD Gundam Barbatos",brand:"Bandai",scale:"MGSD",price:115,priceNote:"",status:"backlog",source:"",notes:"Harga beli RM115."},
-{id:3,name:"HG White Gundam GQuuuuuuX",brand:"Bandai",scale:"HG",price:40,priceNote:"",status:"backlog",source:"Gundam Base / Gamers Arena",notes:"Harga beli RM40."},
-{id:4,name:"RX-78F00/E Gundam",brand:"Bandai",scale:"Model kit",price:null,priceNote:"unknown",status:"backlog",source:"Gundam Base",notes:"Belum dipasang."},
-{id:5,name:"RG Gundam Exia Trans-Am Clear",brand:"Bandai",scale:"RG · Gundam Base Limited",price:null,priceNote:"unknown",status:"backlog",source:"Gundam Base",notes:"Belum dipasang."},
-{id:6,name:"IN ERA+ Azure Falcon",brand:"IN ERA+",scale:"Model kit",price:160,priceNote:"plus",status:"shipping",source:"Online",notes:"Dah order, sedang dalam perjalanan. Harga RM160+."},
-{id:7,name:"Nu Gundam Fukuoka GK",brand:"Dragon Tiger Model",scale:"GK",price:null,priceNote:"unknown",status:"shipping",source:"Online",notes:"Versi Dragon Tiger Model GK, bukan Bandai standard. Harga belum diberi."}
+{name:"Eternal Darkness Eclipse",grade:"Unclassified",scale:"Non-scale",manufacturer:"Other Third-party",price:null,price_note:"unknown",status:"Completed",source:"",notes:"Siap dipasang dan decal. Kemasan hitam matte dengan metallic gold.",image_url:null},
+{name:"MGSD Gundam Barbatos",grade:"MGSD",scale:"Non-scale",manufacturer:"Bandai",price:115,price_note:"exact",status:"Backlog",source:"",notes:"Harga beli RM115.",image_url:null},
+{name:"HG White Gundam GQuuuuuuX",grade:"HG",scale:"1/144",manufacturer:"Bandai",price:40,price_note:"exact",status:"Backlog",source:"Gundam Base / Gamers Arena",notes:"Harga beli RM40.",image_url:null},
+{name:"RX-78F00/E Gundam",grade:"Unclassified",scale:"Non-scale",manufacturer:"Bandai",price:null,price_note:"unknown",status:"Backlog",source:"Gundam Base",notes:"Belum dipasang.",image_url:null},
+{name:"RG Gundam Exia Trans-Am Clear",grade:"RG",scale:"1/144",manufacturer:"Bandai",price:null,price_note:"unknown",status:"Backlog",source:"Gundam Base",notes:"Gundam Base Limited. Belum dipasang.",image_url:null},
+{name:"IN ERA+ Azure Falcon",grade:"Other",scale:"Non-scale",manufacturer:"IN ERA+",price:160,price_note:"plus",status:"Shipping",source:"Online",notes:"Dah order, sedang dalam perjalanan. Harga RM160+.",image_url:null},
+{name:"Nu Gundam Fukuoka GK",grade:"GK / Resin",scale:"Non-scale",manufacturer:"Dragon Tiger Model",price:null,price_note:"unknown",status:"Shipping",source:"Online",notes:"Versi Dragon Tiger Model GK, bukan Bandai standard. Harga belum diberi.",image_url:null}
 ];
-let kits=JSON.parse(localStorage.getItem("aegisArchive")||"null")||seed.map(x=>({...x}));
-const $=id=>document.getElementById(id), labels={backlog:"BACKLOG",shipping:"IN TRANSIT",completed:"COMPLETED",wishlist:"WISHLIST"};
-function persist(){localStorage.setItem("aegisArchive",JSON.stringify(kits));render()}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function render(){let q=$("search").value.toLowerCase(),f=$("filter").value,s=$("sort").value;let a=kits.filter(k=>(f==="all"||k.status===f)&&[k.name,k.brand,k.scale,k.notes].join(" ").toLowerCase().includes(q));a.sort((x,y)=>s==="price"?(x.price??Infinity)-(y.price??Infinity):x.name.localeCompare(y.name));$("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail(${k.id})"><div class="thumb">${k.image?`<img src="${esc(k.image)}" alt="${esc(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Tekan untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${esc(k.brand)} · ${esc(k.scale)}</div><h3>${esc(k.name)}</h3></div><span class="tag ${k.status}">${labels[k.status]}</span></div><div class="body"><small>${esc(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${esc(k.notes)}</small></div><div class="actions"><button onclick="event.stopPropagation();edit(${k.id})">Edit</button><button class="danger" onclick="event.stopPropagation();del(${k.id})">Padam</button></div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';$("total").textContent=kits.length;$("backlog").textContent=kits.filter(k=>k.status==="backlog").length;$("shipping").textContent=kits.filter(k=>k.status==="shipping").length;let sum=kits.filter(k=>k.price!=null&&k.status!=="wishlist").reduce((n,k)=>n+Number(k.price),0);$("spent").textContent="RM"+sum.toLocaleString("en-MY")+(kits.some(k=>k.priceNote==="plus"&&k.status!=="wishlist")?"+":"")}
-let activeDetailId=null;
-function showDetail(id){
- let k=kits.find(x=>x.id===id); if(!k)return; activeDetailId=id;
- $("dname").textContent=k.name;
- $("dbrand").textContent=[k.brand,k.scale].filter(Boolean).join(" · ")||"—";
- $("dstatus").textContent=labels[k.status]||k.status;
- $("dprice").textContent=k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"");
- $("dsource").textContent=k.source||"Belum direkodkan"; $("dnotes").textContent=k.notes||"";
- if(k.image){$("dimage").src=k.image;$("dimage").hidden=false;$("dplaceholder").hidden=true}
- else{$("dimage").hidden=true;$("dplaceholder").hidden=false}
- $("detailModal").classList.add("open");
+const $=id=>document.getElementById(id);
+let sb=null,user=null,kits=[],activeDetailId=null,loadingRecords=false;
+const labels={Backlog:"BACKLOG",Shipping:"IN TRANSIT",Completed:"COMPLETED",Wishlist:"WISHLIST"};
+function setStatus(el,msg){$(el).textContent=msg}
+function showSection(id){["setup","auth","app"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function connectSupabase(){
+ const url=$("projectUrl").value.trim(),key=$("publishableKey").value.trim();
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)||!key.startsWith("sb_publishable_")){setStatus("setupStatus","Semak URL projek dan pastikan key bermula dengan sb_publishable_.");return}
+ localStorage.setItem("aegisSupabaseUrl",url);localStorage.setItem("aegisSupabaseKey",key);
+ initializeSupabase(url,key);
 }
-function closeDetail(){$("detailModal").classList.remove("open")}
-function editFromDetail(){let id=activeDetailId;closeDetail();edit(id)}
-function searchImage(){let k=kits.find(x=>x.id===activeDetailId);if(k)window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(k.name+" model kit"),"_blank")}
-function openForm(){$("f").reset();$("id").value="";$("heading").textContent="Tambah model";$("modal").classList.add("open")}
+function changeConfig(){showSection("setup");$("projectUrl").value=localStorage.getItem("aegisSupabaseUrl")||"";$("publishableKey").value=localStorage.getItem("aegisSupabaseKey")||""}
+function initializeSupabase(url,key){
+ if(!window.supabase){setStatus("setupStatus","Library Supabase gagal dimuatkan. Semak sambungan internet dan refresh.");return}
+ sb=window.supabase.createClient(url,key);
+ $("connectionBadge").textContent="Supabase connected";
+ sb.auth.getSession().then(({data,error})=>{
+  if(error){setStatus("authStatus",error.message);showSection("auth");return}
+  if(data.session){user=data.session.user;loadRecords()}else showSection("auth");
+ });
+ sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;if(user)loadRecords();else{kits=[];showSection("auth")}});
+}
+async function signIn(){
+ const email=$("authEmail").value.trim(),password=$("authPassword").value;
+ if(!email||!password){setStatus("authStatus","Masukkan email dan password.");return}
+ setStatus("authStatus","Sedang log masuk...");
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ setStatus("authStatus",error?error.message:"Log masuk berjaya. Memuatkan koleksi...");
+}
+async function signUp(){
+ const email=$("authEmail").value.trim(),password=$("authPassword").value;
+ if(!email||password.length<8){setStatus("authStatus","Masukkan email dan password sekurang-kurangnya 8 aksara.");return}
+ setStatus("authStatus","Sedang mendaftar...");
+ const {data,error}=await sb.auth.signUp({email,password});
+ setStatus("authStatus",error?error.message:(data.session?"Akaun berjaya dibuat.":"Akaun dibuat. Semak email untuk pengesahan sebelum log masuk."));
+}
+async function logout(){await sb.auth.signOut();user=null;kits=[];showSection("auth")}
+function toUi(row){return {id:row.id,name:row.name,grade:row.grade||"Unclassified",scale:row.scale||"Non-scale",manufacturer:row.manufacturer||"Other",price:row.price==null?null:Number(row.price),priceNote:row.price_note||"exact",status:row.status,source:row.source||"",notes:row.notes||"",imageUrl:row.image_url||"",purchaseDate:row.purchase_date||""}}
+function toDb(k){return {name:k.name,grade:k.grade,scale:k.scale,manufacturer:k.manufacturer,status:k.status,price:k.price,price_note:k.priceNote||"exact",purchase_date:k.purchaseDate||null,image_url:k.imageUrl||null,source:k.source||null,notes:k.notes||null}}
+async function loadRecords(){
+ if(!user||!sb||loadingRecords)return;loadingRecords=true;showSection("app");$("signedInAs").textContent="SIGNED IN: "+user.email;setStatus("dbStatus","Mengambil data daripada Supabase...");
+ const {data,error}=await sb.from("gunpla_collection").select("*").order("created_at",{ascending:true});
+ if(error){setStatus("dbStatus","Ralat memuatkan data: "+error.message);loadingRecords=false;return}
+ kits=(data||[]).map(toUi);
+ if(kits.length===0){const old=JSON.parse(localStorage.getItem("aegisArchive")||"null");const initial=Array.isArray(old)&&old.length?old.map(oldToDb):seed;
+  if(initial.length){const {data:inserted,error:insertError}=await sb.from("gunpla_collection").insert(initial).select("*");if(insertError){setStatus("dbStatus","Database kosong. Import awal gagal: "+insertError.message);render();loadingRecords=false;return}kits=(inserted||[]).map(toUi)}
+ }
+ setStatus("dbStatus","Online · "+kits.length+" rekod disimpan dalam Supabase. Sync aktif untuk akaun ini.");render();loadingRecords=false;
+}
+function oldToDb(k){let grade=k.grade||({ "MGSD":"MGSD","HG":"HG","RG":"RG","GK":"GK / Resin"}[k.scale]||"Unclassified");let scale=({"MGSD":"Non-scale","Model kit":"Non-scale","GK":"Non-scale","HG":"1/144","RG":"1/144"}[k.scale]||k.scale||"Non-scale");let manufacturer=k.manufacturer||k.brand||"Other";let status=({backlog:"Backlog",shipping:"Shipping",completed:"Completed",wishlist:"Wishlist"})[k.status]||k.status||"Backlog";return {name:k.name,grade,scale,manufacturer,status,price:k.price??null,price_note:k.priceNote==="plus"?"plus":k.priceNote==="unknown"?"unknown":"exact",source:k.source||null,notes:k.notes||null,image_url:k.image||null}}
+function render(){
+ const q=$("search").value.toLowerCase(),f=$("filter").value,g=$("gradeFilter").value,s=$("sort").value;
+ const grades=[...new Set(kits.map(k=>k.grade))].sort();$("gradeFilter").innerHTML='<option value="all">Semua grade</option>'+grades.map(x=>`<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");$("gradeFilter").value=g;
+ let a=kits.filter(k=>(f==="all"||k.status===f)&&(g==="all"||k.grade===g)&&[k.name,k.manufacturer,k.grade,k.scale,k.notes].join(" ").toLowerCase().includes(q));
+ a.sort((x,y)=>s==="price"?(x.price??Infinity)-(y.price??Infinity):x.name.localeCompare(y.name));
+ $("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail('${k.id}')"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Klik untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)} · ${escapeHtml(k.scale)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">${labels[k.status]||k.status}</span></div><div class="body"><small>${escapeHtml(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${escapeHtml(k.notes)}</small></div><div class="actions"><button onclick="event.stopPropagation();editRecord('${k.id}')">Edit</button><button class="danger" onclick="event.stopPropagation();deleteRecord('${k.id}')">Padam</button></div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';
+ $("total").textContent=kits.length;$("backlog").textContent=kits.filter(k=>k.status==="Backlog").length;$("shipping").textContent=kits.filter(k=>k.status==="Shipping").length;
+ let sum=kits.filter(k=>k.price!=null&&k.status!=="Wishlist").reduce((n,k)=>n+Number(k.price),0);$("spent").textContent="RM"+sum.toLocaleString("en-MY")+(kits.some(k=>k.priceNote==="plus"&&k.status!=="Wishlist")?"+":"");
+}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function openForm(){$("f").reset();$("recordId").value="";$("heading").textContent="Tambah model";$("modal").classList.add("open")}
 function closeForm(){$("modal").classList.remove("open")}
-function edit(id){let k=kits.find(x=>x.id===id);openForm();$("heading").textContent="Edit model";["name","brand","scale","price","priceNote","status","source","image","notes"].forEach(x=>$(x).value=k[x]??"");$("id").value=id}
-function save(e){e.preventDefault();let id=Number($("id").value),k={id:id||Date.now(),name:$("name").value.trim(),brand:$("brand").value.trim(),scale:$("scale").value.trim(),price:$("price").value===""?null:Number($("price").value),priceNote:$("priceNote").value,status:$("status").value,source:$("source").value.trim(),image:$("image").value.trim(),notes:$("notes").value.trim()};kits=id?kits.map(x=>x.id===id?k:x):[...kits,k];closeForm();persist()}
-function del(id){let k=kits.find(x=>x.id===id);if(confirm("Padam "+k.name+"?")){kits=kits.filter(x=>x.id!==id);persist()}}
-function exportData(){let b=new Blob([JSON.stringify(kits,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="aegis-gunpla-backup.json";a.click();URL.revokeObjectURL(a.href)}
-function importData(e){let r=new FileReader();r.onload=()=>{try{let v=JSON.parse(r.result);if(!Array.isArray(v))throw 0;kits=v;persist();alert("Backup diimport.")}catch{alert("Fail JSON tidak sah.")}};r.readAsText(e.target.files[0])}
-function resetData(){if(confirm("Pulihkan data asal? Perubahan semasa akan hilang.")){kits=seed.map(x=>({...x}));persist()}}
-render();
-</script></body></html>
+function editRecord(id){let k=kits.find(x=>x.id===id);if(!k)return;openForm();$("heading").textContent="Edit model";$("recordId").value=k.id;["name","grade","scale","manufacturer","status","price","source","notes"].forEach(x=>$(x).value=k[x]??"");$("priceNote").value=k.priceNote||"exact";$("imageUrl").value=k.imageUrl||"";$("purchaseDate").value=k.purchaseDate||""}
+async function saveRecord(e){
+ e.preventDefault();if(!user)return;const id=$("recordId").value;
+ const k={name:$("name").value.trim(),grade:$("grade").value,scale:$("scale").value,manufacturer:$("manufacturer").value,status:$("status").value,price:$("price").value===""?null:Number($("price").value),priceNote:$("priceNote").value,purchaseDate:$("purchaseDate").value,source:$("source").value.trim(),imageUrl:$("imageUrl").value.trim(),notes:$("notes").value.trim()};
+ $("saveBtn").disabled=true;$("saveBtn").textContent="Menyimpan...";
+ let result=id?await sb.from("gunpla_collection").update(toDb(k)).eq("id",id).select("*").single():await sb.from("gunpla_collection").insert(toDb(k)).select("*").single();
+ $("saveBtn").disabled=false;$("saveBtn").textContent="Simpan ke database";
+ if(result.error){alert("Gagal menyimpan: "+result.error.message);return}
+ if(id)kits=kits.map(x=>x.id===id?toUi(result.data):x);else kits.push(toUi(result.data));closeForm();render();setStatus("dbStatus","Online · perubahan berjaya disimpan.");
+}
+function showDetail(id){let k=kits.find(x=>x.id===id);if(!k)return;activeDetailId=id;$("dname").textContent=k.name;$("dgrade").textContent=k.grade;$("dscale").textContent=k.scale;$("dmanufacturer").textContent=k.manufacturer;$("dstatus").textContent=labels[k.status]||k.status;$("dprice").textContent=k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"");$("dsource").textContent=k.source||"Belum direkodkan";$("dnotes").textContent=k.notes||"";if(k.imageUrl){$("dimage").src=k.imageUrl;$("dimage").classList.remove("hidden");$("dplaceholder").classList.add("hidden")}else{$("dimage").classList.add("hidden");$("dplaceholder").classList.remove("hidden")}$("detailModal").classList.add("open")}
+function closeDetail(){$("detailModal").classList.remove("open")}
+function editFromDetail(){let id=activeDetailId;closeDetail();editRecord(id)}
+async function deleteFromDetail(){if(activeDetailId)await deleteRecord(activeDetailId);closeDetail()}
+async function deleteRecord(id){let k=kits.find(x=>x.id===id);if(!k||!confirm("Padam "+k.name+" daripada database?"))return;const {error}=await sb.from("gunpla_collection").delete().eq("id",id);if(error){alert("Gagal padam: "+error.message);return}kits=kits.filter(x=>x.id!==id);render();setStatus("dbStatus","Rekod dipadam daripada Supabase.")}
+function searchImage(){let k=kits.find(x=>x.id===activeDetailId);if(k)window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(k.name+" model kit"),"_blank")}
+async function syncNow(){await loadRecords()}
+function exportData(){const blob=new Blob([JSON.stringify(kits,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="aegis-gunpla-backup.json";a.click();URL.revokeObjectURL(a.href)}
+function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const arr=JSON.parse(reader.result);if(!Array.isArray(arr))throw Error("Format JSON tidak sah");for(const old of arr){const row=oldToDb(old);const {error}=await sb.from("gunpla_collection").insert(row);if(error)throw error}await loadRecords();alert("Import selesai.")}catch(err){alert("Import gagal: "+err.message)}};reader.readAsText(file);e.target.value=""}
+const savedUrl=localStorage.getItem("aegisSupabaseUrl"),savedKey=localStorage.getItem("aegisSupabaseKey");
+if(savedUrl&&savedKey){$("projectUrl").value=savedUrl;$("publishableKey").value=savedKey;initializeSupabase(savedUrl,savedKey)}else showSection("setup");
+</script>
+</body></html>
