@@ -35,10 +35,64 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
 .authwrap{max-width:560px;margin:25px auto}.authwrap .panel{padding:22px}.authgrid{display:grid;gap:12px}.statusline{font-size:12px;color:var(--m);margin:8px 0}.hidden{display:none!important}
 .badge{display:inline-block;border:1px solid #42627a;border-radius:99px;padding:4px 9px;font-size:11px;color:#b7d9e8}
 @media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.wide{grid-column:auto}header,main{padding:16px 12px}}
+
+:root{--bg:#080d18;--p:#101b2d;--line:#344765;--t:#edf3ff;--m:#9aaac3;--c:#e0bd68;--g:#7fd0e8;--red:#b94c59}
+body{background:radial-gradient(ellipse at 10% 0%,#243c60 0,transparent 42%),radial-gradient(ellipse at 95% 10%,#3b2b42 0,transparent 35%),var(--bg)}
+header{border-bottom-color:#465777}
+h1{letter-spacing:2.5px}
+.brandmark{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--c);color:var(--c);border-radius:8px;font-weight:900;margin-right:9px;transform:skew(-8deg)}
+.badge{border-color:#8c7542;color:#f0d895}
+button{border-color:#586d8b;background:#1b2c45}
+button:hover{border-color:var(--c);filter:brightness(1.12)}
+.primary{background:#8c6b2e;border-color:#d6b56a;color:#fff7e5}
+.stats .stat{border-color:#465777;background:linear-gradient(145deg,#192944,#0d1728)}
+.stat strong{color:#f4d58c}
+.navtabs{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0 14px;padding:8px;background:#0b1423;border:1px solid var(--line);border-radius:10px}
+.navtabs button{flex:1;min-width:115px}
+.navtabs button.active{background:#79602e;border-color:#e0bd68;color:#fff}
+.viewpanel{display:none}.viewpanel.active{display:block}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(110deg,#1b2e4b,#111b2c);margin:14px 0}
+.hero .eyebrow{font-size:10px;letter-spacing:2px;color:var(--c);font-weight:800}
+.hero h2{margin:5px 0;font-size:clamp(18px,3vw,25px)}
+.hero p{margin:0;color:var(--m);font-size:12px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 10px}
+.profilebox{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center}
+.avatar{width:94px;height:94px;border-radius:14px;border:1px solid var(--c);display:grid;place-items:center;background:linear-gradient(145deg,#293b5c,#111a2b);font-size:34px;color:var(--c);font-weight:900;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.memberrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:9px;background:#0c1727;margin:8px 0}
+.memberrow strong{display:block}.memberrow small{display:block}
+.rank{font-size:20px;font-weight:900;color:var(--c);min-width:34px}
+.uploadrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.checkline{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:7px;background:#0b1727}
+.checkline input{width:auto}
+.mini{font-size:11px;color:var(--m)}
+@media(max-width:560px){
+ .navtabs{display:grid;grid-template-columns:repeat(3,1fr)}
+ .navtabs button{min-width:0;padding:9px 5px;font-size:11px}
+ .hero{align-items:flex-start}
+ .profilebox{grid-template-columns:1fr}
+ .avatar{width:76px;height:76px}
+ .toolbar select{flex:1;min-width:120px}
+ .toolbar #search{flex-basis:100%}
+}
+
+
+.langbar{display:flex;align-items:center;gap:7px}
+.langbar select{width:auto;min-width:70px;padding:7px 9px;font-size:12px}
+.onlinepill{display:inline-flex;align-items:center;gap:7px;border:1px solid #315c52;background:#102a28;color:#8be0bd;border-radius:20px;padding:7px 11px;font-size:12px}
+.online-dot{width:7px;height:7px;background:#43d69b;border-radius:50%;box-shadow:0 0 9px #43d69b}
+.chatbox{border:1px solid var(--line);border-radius:10px;background:#091525;overflow:hidden}
+.chatmessages{height:300px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+.chatmsg{max-width:85%;padding:10px 12px;border-radius:10px;background:#1a2d47;border:1px solid #354d6c;align-self:flex-start}
+.chatmsg.mine{align-self:flex-end;background:#263d53;border-color:#53718c}
+.chatmsg small{display:block;margin-top:5px;font-size:10px}
+.chatcomposer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.chatcomposer input{flex:1;min-width:0}
+.supportfloat{position:fixed;right:18px;bottom:18px;z-index:30;box-shadow:0 8px 24px #0008}
 </style>
 </head>
 <body>
-<header><div class="top"><div><h1>AEGIS // GUNPLA ARCHIVE</h1><p>COLLECTION DATABASE · BACKLOG CONTROL · ONLINE SYNC</p></div><div class="top"><span id="connectionBadge" class="badge">Belum disambungkan</span><button id="logoutBtn" class="hidden" onclick="logout()">Log keluar</button></div></div></header>
+<header><div class="top"><div><h1><span class="brandmark">A</span>AEGIS // GUNPLA ARCHIVE</h1><p>COLLECTION DATABASE · BACKLOG CONTROL · ONLINE SYNC</p></div><div class="top"><div class="langbar"><span class="onlinepill"><i class="online-dot"></i><span id="onlineCount">0 online</span></span><select id="languageSelect" onchange="setLanguage(this.value)" aria-label="Language"><option value="ms">BM</option><option value="en">EN</option></select></div><span id="connectionBadge" class="badge">Belum disambungkan</span><button id="logoutBtn" class="hidden" onclick="logout()">Log keluar</button></div></div></header>
 
 <main>
 <section id="auth" class="authwrap hidden">
@@ -56,23 +110,85 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
 </section>
 
 <section id="app" class="hidden">
- <div class="top"><div><h2>COMMAND CENTER</h2><small id="signedInAs"></small></div><div class="toolbar"><button id="communityBtn" onclick="toggleCommunity()" class="hidden">Community view: OFF</button><button class="primary" onclick="openForm()">+ Tambah Gundam</button><button onclick="syncNow()">Sync</button><button onclick="logout()">Log keluar</button></div></div>
- <div class="stats">
-  <div class="stat"><small>Jumlah koleksi</small><strong id="total">0</strong></div>
-  <div class="stat"><small>Backlog</small><strong id="backlog">0</strong></div>
-  <div class="stat"><small>Dalam perjalanan</small><strong id="shipping">0</strong></div>
-  <div class="stat"><small>Belanja diketahui</small><strong id="spent">RM0</strong></div>
+ <div class="hero">
+  <div><div class="eyebrow">EARTH FEDERATION DATABASE // UC ARCHIVE NETWORK</div><h2>COMMAND CENTER</h2><p id="signedInAs"></p></div>
+  <div class="toolbar"><button id="communityBtn" onclick="toggleCommunity()" class="hidden">Founder: semua data OFF</button><button class="primary" onclick="openForm()">+ Tambah Gundam</button><button onclick="syncNow()">Sync</button><button onclick="logout()">Log keluar</button></div>
  </div>
- <div class="toolbar">
-  <input id="search" placeholder="Cari model / grade / jenama..." oninput="render()">
-  <select id="filter" onchange="render()"><option value="all">Semua status</option><option value="Backlog">Backlog</option><option value="Shipping">Dalam perjalanan</option><option value="Completed">Siap</option><option value="Wishlist">Wishlist</option></select>
-  <select id="gradeFilter" onchange="render()"><option value="all">Semua grade</option></select>
-  <select id="sort" onchange="render()"><option value="name">Susun nama</option><option value="price">Harga rendah dahulu</option></select>
- </div>
- <div class="top"><h3 id="collectionHeading">MY COLLECTION</h3><small id="count"></small></div>
- <div class="grid" id="cards"></div>
- <div class="panel" style="margin-top:18px"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p><p class="note">Setiap akaun mempunyai ruang koleksi peribadi. Admin boleh melihat semua koleksi melalui Community view.</p></div>
- <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
+ <nav class="navtabs" aria-label="AEGIS navigation">
+  <button class="active" data-view="collection" onclick="switchView('collection')">▦ Koleksi</button>
+  <button data-view="wishlist" onclick="switchView('wishlist')">☆ Wishlist</button>
+  <button data-view="community" onclick="switchView('community')">◎ Community</button>
+  <button data-view="leaderboard" onclick="switchView('leaderboard')">♜ Ranking</button>
+  <button data-view="profile" onclick="switchView('profile')">◉ Profil</button>
+  <button data-view="support" onclick="switchView('support')">✉ Support</button>
+  <button data-view="admin" id="adminTab" class="hidden" onclick="switchView('admin')">⚙ Founder</button>
+ </nav>
+ <section id="collectionView" class="viewpanel active">
+  <div class="stats">
+   <div class="stat"><small>Jumlah koleksi</small><strong id="total">0</strong></div>
+   <div class="stat"><small>Backlog</small><strong id="backlog">0</strong></div>
+   <div class="stat"><small>Dalam perjalanan</small><strong id="shipping">0</strong></div>
+   <div class="stat"><small>Belanja diketahui</small><strong id="spent">RM0</strong></div>
+  </div>
+  <div class="toolbar">
+   <input id="search" placeholder="Cari model / grade / jenama..." oninput="render()">
+   <select id="filter" onchange="render()"><option value="all">Semua status</option><option value="Backlog">Backlog</option><option value="Shipping">Dalam perjalanan</option><option value="Completed">Siap</option><option value="Wishlist">Wishlist</option></select>
+   <select id="gradeFilter" onchange="render()"><option value="all">Semua grade</option></select>
+   <select id="sort" onchange="render()"><option value="name">Susun nama</option><option value="price">Harga rendah dahulu</option></select>
+  </div>
+  <div class="sectionhead"><h3 id="collectionHeading">MY COLLECTION</h3><small id="count"></small></div>
+  <div class="grid" id="cards"></div>
+ </section>
+ <section id="wishlistView" class="viewpanel">
+  <div class="sectionhead"><div><h2>WISHLIST</h2><p class="muted">Model yang sedang menjadi sasaran koleksi.</p></div><button class="primary" onclick="openForm('Wishlist')">+ Tambah wishlist</button></div>
+  <div class="grid" id="wishlistCards"></div>
+ </section>
+ <section id="communityView" class="viewpanel">
+  <div class="hero"><div><div class="eyebrow">PUBLIC HANGAR</div><h2>COMMUNITY COLLECTION</h2><p>Koleksi yang ahli pilih untuk dikongsi.</p></div><span class="badge">Ahli AEGIS</span></div>
+  <div id="communityContent"><p class="muted">Tekan Sync Community untuk memuatkan koleksi yang dikongsi.</p></div>
+  <button onclick="loadCommunity()">Sync Community</button>
+ </section>
+ <section id="leaderboardView" class="viewpanel">
+  <div class="sectionhead"><div><h2>ACE PILOTS // LEADERBOARD</h2><p class="muted">Ranking berdasarkan jumlah model yang dikongsi secara awam.</p></div></div>
+  <div id="leaderboardContent" class="panel">Tekan Sync Ranking untuk memuatkan ranking.</div>
+  <button onclick="loadLeaderboard()">Sync Ranking</button>
+ </section>
+ <section id="profileView" class="viewpanel">
+  <div class="panel">
+   <div class="profilebox"><div class="avatar" id="profileAvatar">A</div><div><div class="eyebrow">PILOT IDENTIFICATION</div><h2 id="profileEmail">AEGIS MEMBER</h2><p class="muted">Profil komuniti kau.</p></div></div>
+   <div class="form" style="margin-top:18px">
+    <div class="field"><label>CALLSIGN / NAMA PAPARAN</label><input id="displayName" maxlength="40" placeholder="Contoh: Iman"></div>
+    <div class="field"><label>AVATAR IMAGE URL</label><input id="avatarUrl" type="url" placeholder="https://..."></div>
+    <div class="field wide"><label>BIO RINGKAS</label><textarea id="bio" rows="3" maxlength="180" placeholder="Ceritakan sedikit tentang koleksi Gunpla kau..."></textarea></div>
+    <label class="checkline wide"><input id="profilePublic" type="checkbox" checked> Paparkan profil aku dalam Community</label>
+   </div>
+   <div class="foot"><button class="primary" onclick="saveProfile()">Simpan profil</button></div>
+   <p class="mini">Email login tidak dipaparkan kepada ahli lain. Gunakan callsign jika mahu identiti komuniti.</p>
+  </div>
+ </section>
+ <section id="supportView" class="viewpanel">
+  <div class="sectionhead"><div><h2 id="supportHeading">AEGIS SUPPORT</h2><p class="muted" id="supportIntro">Hantar mesej terus kepada admin.</p></div><span class="badge">PRIVATE TICKET</span></div>
+  <div class="panel">
+   <div class="field"><label id="supportSubjectLabel">SUBJEK</label><input id="supportSubject" maxlength="100" placeholder="Contoh: Masalah upload gambar"></div>
+   <div class="chatbox" style="margin-top:12px"><div id="supportMessages" class="chatmessages"><p class="muted">Pilih atau mulakan perbualan dengan admin.</p></div>
+    <div class="chatcomposer"><input id="supportMessage" maxlength="2000" placeholder="Tulis mesej kepada admin..."><button class="primary" onclick="sendSupportMessage()" id="supportSend">Hantar</button></div>
+   </div>
+   <div class="foot"><button onclick="loadSupportMessages()">Refresh chat</button><small class="mini" id="supportPrivacy">Perbualan ini hanya boleh dilihat oleh kau dan admin.</small></div>
+  </div>
+  <div id="adminSupportPanel" class="panel hidden" style="margin-top:14px"><h3>ADMIN INBOX</h3><p class="muted">Senarai mesej sokongan ahli.</p><div id="adminSupportThreads"></div></div>
+ </section>
+ <section id="adminView" class="viewpanel">
+  <div class="hero"><div><div class="eyebrow">COMMAND AUTHORITY</div><h2>FOUNDER CONTROL</h2><p>Ringkasan data komuniti dan kawalan founder.</p></div></div>
+  <div class="stats">
+   <div class="stat"><small>Rekod dipaparkan</small><strong id="adminRecords">0</strong></div>
+   <div class="stat"><small>Akaun dikenal pasti</small><strong id="adminMembers">0</strong></div>
+   <div class="stat"><small>Shared models</small><strong id="adminShared">0</strong></div>
+   <div class="stat"><small>Had setiap akaun</small><strong>100</strong></div>
+  </div>
+  <div class="panel"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p><p class="note">Founder boleh melihat semua rekod melalui akses admin. Pengurusan rekod ahli lain kekal read-only.</p></div>
+  <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
+ </section>
+ <div class="panel" style="margin-top:18px"><b>AEGIS NETWORK STATUS</b><p class="muted" id="dbStatusMirror">Online · Community database</p><p class="note">Setiap akaun mengurus koleksi sendiri. Model hanya muncul dalam Community apabila pemilik mengaktifkan pilihan kongsi.</p></div>
 </section>
 </main>
 
@@ -89,6 +205,8 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
  <div class="field"><label>TARIKH PEMBELIAN</label><input id="purchaseDate" type="date"></div>
  <div class="field"><label>KEDAI / SUMBER</label><input id="source"></div>
  <div class="field wide"><label>PAUTAN GAMBAR (URL IMEJ)</label><input id="imageUrl" type="url" placeholder="https://...jpg atau .png"></div>
+ <div class="field wide"><label>UPLOAD GAMBAR DARI DEVICE</label><div class="uploadrow"><input id="imageFile" type="file" accept="image/*"><button type="button" onclick="uploadModelImage()">Upload ke AEGIS</button></div><small class="mini" id="uploadStatus">Gambar disimpan dalam Supabase Storage selepas bucket disediakan.</small></div>
+ <label class="checkline wide"><input id="isPublic" type="checkbox"> Kongsi model ini dalam Community</label>
  <div class="field wide"><label>NOTA</label><textarea id="notes" rows="2"></textarea></div>
 </div><div class="foot"><button type="button" onclick="closeForm()">Batal</button><button class="primary" id="saveBtn">Simpan ke database</button></div></form>
 </div></div>
@@ -119,6 +237,166 @@ const isAdmin=()=>user?.app_metadata?.role==="admin";
 const labels={Backlog:"BACKLOG",Shipping:"IN TRANSIT",Completed:"COMPLETED",Wishlist:"WISHLIST"};
 function setStatus(el,msg){$(el).textContent=msg}
 function showSection(id){["auth","app"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+
+let currentView="collection", communityKits=[], profileData=null;
+
+const I18N={
+ ms:{online:"online",collection:"Koleksi",wishlist:"Wishlist",community:"Community",leaderboard:"Ranking",profile:"Profil",support:"Support",admin:"Founder",add:"+ Tambah Gundam",sync:"Sync",logout:"Log keluar",search:"Cari model / grade / jenama...",allStatus:"Semua status",allGrades:"Semua grade",myCollection:"KOLEKSI SAYA",supportHeading:"AEGIS SUPPORT",supportIntro:"Hantar mesej terus kepada admin.",subject:"SUBJEK",send:"Hantar",message:"Tulis mesej kepada admin...",private:"Perbualan ini hanya boleh dilihat oleh kau dan admin.",refresh:"Refresh chat",noChat:"Belum ada mesej. Mulakan perbualan dengan admin.",supportError:"Tidak dapat memuatkan support chat. Pastikan SQL V6 sudah dijalankan."},
+ en:{online:"online",collection:"Collection",wishlist:"Wishlist",community:"Community",leaderboard:"Leaderboard",profile:"Profile",support:"Support",admin:"Founder",add:"+ Add Gunpla",sync:"Sync",logout:"Log out",search:"Search model / grade / brand...",allStatus:"All statuses",allGrades:"All grades",myCollection:"MY COLLECTION",supportHeading:"AEGIS SUPPORT",supportIntro:"Send a message directly to the admin.",subject:"SUBJECT",send:"Send",message:"Write a message to admin...",private:"This conversation is visible only to you and the admin.",refresh:"Refresh chat",noChat:"No messages yet. Start a conversation with the admin.",supportError:"Unable to load support chat. Make sure SQL V6 has been run."}
+};
+let currentLanguage="ms";
+function setLanguage(lang){
+ currentLanguage=I18N[lang]?lang:"ms";
+ const t=I18N[currentLanguage];
+ $("languageSelect").value=currentLanguage;
+ $("onlineCount").textContent=onlineUsers+" "+t.online;
+ const navKeys=["collection","wishlist","community","leaderboard","profile"];
+ document.querySelectorAll(".navtabs button[data-view]").forEach(b=>{const key=b.dataset.view;if(t[key])b.textContent=({collection:"▦ ",wishlist:"☆ ",community:"◎ ",leaderboard:"♜ ",profile:"◉ "}[key])+t[key];});
+ const sup=document.querySelector('.navtabs button[data-view="support"]');if(sup)sup.textContent="✉ "+t.support;
+ const admin=document.getElementById("adminTab");if(admin)admin.textContent="⚙ "+t.admin;
+ const add=document.querySelector(".hero .primary");if(add)add.textContent=t.add;
+ const logout=document.querySelector(".hero button[onclick='logout()']");if(logout)logout.textContent=t.logout;
+ const search=$("search");if(search)search.placeholder=t.search;
+ const filter=$("filter");if(filter&&filter.options.length>=1)filter.options[0].text=t.allStatus;
+ const grade=$("gradeFilter");if(grade&&grade.options.length)grade.options[0].text=t.allGrades;
+ if($("collectionHeading"))$("collectionHeading").textContent=t.myCollection;
+ $("supportHeading").textContent=t.supportHeading;$("supportIntro").textContent=t.supportIntro;$("supportSubjectLabel").textContent=t.subject;$("supportSend").textContent=t.send;$("supportMessage").placeholder=t.message;$("supportPrivacy").textContent=t.private;
+}
+let onlineChannel=null,onlineUsers=0;
+function startOnlinePresence(){
+ if(!sb||!user)return;
+ if(onlineChannel){sb.removeChannel(onlineChannel);onlineChannel=null}
+ onlineChannel=sb.channel("aegis-online-presence",{config:{presence:{key:user.id}}});
+ onlineChannel.on("presence",{event:"sync"},()=>{
+  const state=onlineChannel.presenceState();onlineUsers=Object.keys(state).length;
+  $("onlineCount").textContent=onlineUsers+" "+I18N[currentLanguage].online;
+ });
+ onlineChannel.subscribe(async status=>{if(status==="SUBSCRIBED")await onlineChannel.track({user_id:user.id,online_at:new Date().toISOString()})});
+}
+function stopOnlinePresence(){if(sb&&onlineChannel){sb.removeChannel(onlineChannel);onlineChannel=null}onlineUsers=0;$("onlineCount").textContent="0 "+I18N[currentLanguage].online}
+let supportThreadId=null;
+async function loadSupportMessages(){
+ if(!sb||!user)return;
+ $("supportMessages").innerHTML='<p class="muted">Loading...</p>';
+ let threadsQuery=sb.from("aegis_support_threads").select("*");
+ if(isAdmin()&&supportThreadId){threadsQuery=threadsQuery.eq("id",supportThreadId)}else{threadsQuery=threadsQuery.eq("user_id",user.id).order("created_at",{ascending:false}).limit(1)}
+ const {data:threads,error}=await threadsQuery;
+ if(error){$("supportMessages").textContent=I18N[currentLanguage].supportError+" "+error.message;return}
+ if(threads&&threads.length){supportThreadId=threads[0].id;$("supportSubject").value=threads[0].subject||""}
+ else{supportThreadId=null;$("supportMessages").textContent=I18N[currentLanguage].noChat;return}
+ const {data:messages,error:msgError}=await sb.from("aegis_support_messages").select("*").eq("thread_id",supportThreadId).order("created_at",{ascending:true});
+ if(msgError){$("supportMessages").textContent=msgError.message;return}
+ $("supportMessages").innerHTML=(messages||[]).map(m=>`<div class="chatmsg ${m.sender_id===user.id?"mine":""}">${escapeHtml(m.message)}<small>${m.sender_id===user.id?"You":"AEGIS Admin"} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join("")||`<p class="muted">${I18N[currentLanguage].noChat}</p>`;
+ $("supportMessages").scrollTop=$("supportMessages").scrollHeight;
+}
+async function sendSupportMessage(){
+ if(!sb||!user)return;
+ const message=$("supportMessage").value.trim(),subject=$("supportSubject").value.trim()||"AEGIS Support";
+ if(!message)return;
+ if(!supportThreadId){
+  const {data:thread,error}=await sb.from("aegis_support_threads").insert({user_id:user.id,subject}).select().single();
+  if(error){alert("Tidak dapat membuka tiket: "+error.message);return}
+  supportThreadId=thread.id;
+ }
+ const {error}=await sb.from("aegis_support_messages").insert({thread_id:supportThreadId,sender_id:user.id,message});
+ if(error){alert("Mesej gagal dihantar: "+error.message);return}
+ $("supportMessage").value="";if(isAdmin())await openAdminThread(supportThreadId);else await loadSupportMessages();
+}
+async function loadAdminSupport(){
+ if(!isAdmin())return;
+ const {data:threads,error}=await sb.from("aegis_support_threads").select("*").order("updated_at",{ascending:false}).limit(100);
+ if(error){$("adminSupportThreads").textContent=error.message;return}
+ $("adminSupportThreads").innerHTML=(threads||[]).map(t=>`<div class="memberrow"><div style="flex:1"><strong>${escapeHtml(t.subject)}</strong><small>${t.user_id} · ${new Date(t.updated_at).toLocaleString()}</small></div><button onclick="openAdminThread('${t.id}')">Open</button></div>`).join("")||"No support tickets.";
+}
+async function openAdminThread(id){
+ supportThreadId=id;
+ const {data:msgs,error}=await sb.from("aegis_support_messages").select("*").eq("thread_id",id).order("created_at",{ascending:true});
+ if(error){alert(error.message);return}
+ $("supportMessages").innerHTML=(msgs||[]).map(m=>`<div class="chatmsg ${m.sender_id===user.id?"mine":""}">${escapeHtml(m.message)}<small>${m.sender_id===user.id?"You":"Member"} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join("");
+ $("supportSubject").value="";
+ switchView("support");
+}
+
+function switchView(view){
+ currentView=view;
+ document.querySelectorAll(".viewpanel").forEach(x=>x.classList.remove("active"));
+ const panel=$(view+"View");if(panel)panel.classList.add("active");
+ document.querySelectorAll(".navtabs button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ if(view==="community")loadCommunity();
+ if(view==="leaderboard")loadLeaderboard();
+ if(view==="profile")loadProfile();
+ if(view==="support"){loadSupportMessages();if(isAdmin())loadAdminSupport();}
+ if(view==="admin"&&!isAdmin())switchView("collection");
+}
+function renderWishlist(){
+ const list=kits.filter(k=>k.status==="Wishlist");
+ $("wishlistCards").innerHTML=list.length?list.map(k=>`<article class="card"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}">`:"WISHLIST / IMAGE PENDING"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag wishlist">WISHLIST</span></div><div class="body"><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")}</div></div><div class="actions"><button onclick="editRecord('${k.id}')">Edit</button><button onclick="showDetail('${k.id}')">Butiran</button></div></article>`).join(""):'<p class="muted">Wishlist kau masih kosong. Tambah model sasaran pertama.</p>';
+}
+async function loadCommunity(){
+ if(!sb||!user)return;
+ $("communityContent").innerHTML='<p class="muted">Memuatkan model yang dikongsi...</p>';
+ const {data,error}=await sb.from("gunpla_collection").select("*").eq("is_public",true).order("created_at",{ascending:false}).limit(200);
+ if(error){$("communityContent").textContent="Community belum tersedia: "+error.message;return}
+ communityKits=(data||[]).map(toUi);
+ if(!communityKits.length){$("communityContent").innerHTML='<p class="muted">Belum ada ahli berkongsi model. Jadilah yang pertama tandakan “Kongsi model ini dalam Community”.</p>';return}
+ const memberIds=[...new Set(communityKits.map(k=>k.ownerId))];
+ const {data:memberProfiles}=await sb.from("aegis_profiles").select("user_id,display_name,show_in_community").in("user_id",memberIds);
+ const memberNames=Object.fromEntries((memberProfiles||[]).map(p=>[p.user_id,p.show_in_community?p.display_name:"AEGIS Pilot"]));
+ $("communityContent").innerHTML='<div class="grid">'+communityKits.map(k=>`<article class="card"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}">`:"COMMUNITY MODEL"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">SHARED</span></div><div class="body"><small>By ${escapeHtml(memberNames[k.ownerId]||"AEGIS Pilot")} · ${escapeHtml(k.status)} · ${escapeHtml(k.scale)}</small></div><div class="actions"><button onclick="showCommunityDetail('${k.id}')">Lihat butiran</button></div></article>`).join("")+'</div>';
+}
+function showCommunityDetail(id){
+ const k=communityKits.find(x=>x.id===id);if(!k)return;
+ activeDetailId=id;$("dname").textContent=k.name;$("dgrade").textContent=k.grade;$("dscale").textContent=k.scale;$("dmanufacturer").textContent=k.manufacturer;$("dstatus").textContent=labels[k.status]||k.status;$("dprice").textContent=k.price==null?"Tidak dikongsi":"RM"+Number(k.price).toLocaleString("en-MY");$("dsource").textContent="Ahli AEGIS";$("dnotes").textContent=k.notes||"";
+ if(k.imageUrl){$("dimage").src=k.imageUrl;$("dimage").classList.remove("hidden");$("dplaceholder").classList.add("hidden")}else{$("dimage").classList.add("hidden");$("dplaceholder").classList.remove("hidden")}
+ $("detailModal").classList.add("open");
+ // Hide all mutation controls for community records
+ $("detailModal").querySelectorAll(".foot button").forEach((b,i)=>b.classList.toggle("hidden",i>0));
+}
+async function loadProfile(){
+ if(!sb||!user)return;
+ $("profileEmail").textContent=user.email||"AEGIS MEMBER";
+ const {data,error}=await sb.from("aegis_profiles").select("*").eq("user_id",user.id).maybeSingle();
+ if(error){$("dbStatusMirror").textContent="Profil belum disediakan: "+error.message;return}
+ profileData=data||{};
+ $("displayName").value=profileData.display_name||"";
+ $("avatarUrl").value=profileData.avatar_url||"";
+ $("bio").value=profileData.bio||"";
+ $("profilePublic").checked=profileData.show_in_community!==false;
+ $("profileAvatar").innerHTML=profileData.avatar_url?`<img src="${escapeHtml(profileData.avatar_url)}" alt="Avatar">`:(profileData.display_name||user.email||"A").slice(0,1).toUpperCase();
+}
+async function saveProfile(){
+ if(!user)return;
+ const payload={user_id:user.id,display_name:$("displayName").value.trim()||"AEGIS Pilot",avatar_url:$("avatarUrl").value.trim()||null,bio:$("bio").value.trim(),show_in_community:$("profilePublic").checked,updated_at:new Date().toISOString()};
+ const {error}=await sb.from("aegis_profiles").upsert(payload,{onConflict:"user_id"});
+ if(error){alert("Profil gagal disimpan: "+error.message);return}
+ alert("Profil AEGIS berjaya disimpan.");loadProfile();
+}
+async function loadLeaderboard(){
+ if(!sb||!user)return;
+ $("leaderboardContent").textContent="Mengira ranking komuniti...";
+ const {data:models,error}=await sb.from("gunpla_collection").select("user_id").eq("is_public",true);
+ if(error){$("leaderboardContent").textContent="Ranking belum tersedia: "+error.message;return}
+ const counts={};(models||[]).forEach(x=>counts[x.user_id]=(counts[x.user_id]||0)+1);
+ const ids=Object.keys(counts);
+ if(!ids.length){$("leaderboardContent").textContent="Belum ada model awam untuk ranking.";return}
+ const {data:profiles}=await sb.from("aegis_profiles").select("user_id,display_name,avatar_url").in("user_id",ids);
+ const names=Object.fromEntries((profiles||[]).map(p=>[p.user_id,p.display_name||"AEGIS Pilot"]));
+ const rows=ids.map(id=>({id,name:names[id]||"AEGIS Pilot",count:counts[id]})).sort((a,b)=>b.count-a.count);
+ $("leaderboardContent").innerHTML=rows.map((r,i)=>`<div class="memberrow"><div class="rank">#${i+1}</div><div style="flex:1"><strong>${escapeHtml(r.name)}</strong><small>Public collection</small></div><b>${r.count} model</b></div>`).join("");
+}
+async function uploadModelImage(){
+ const file=$("imageFile").files?.[0];if(!file||!user)return alert("Pilih gambar dahulu.");
+ if(!file.type.startsWith("image/"))return alert("Fail mestilah imej.");
+ if(file.size>5*1024*1024)return alert("Had gambar ialah 5 MB.");
+ $("uploadStatus").textContent="Sedang upload...";
+ const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+ const path=`${user.id}/${crypto.randomUUID()}.${ext}`;
+ const {error}=await sb.storage.from("aegis-uploads").upload(path,file,{upsert:false,contentType:file.type});
+ if(error){$("uploadStatus").textContent="Upload gagal: "+error.message;return}
+ const {data}=sb.storage.from("aegis-uploads").getPublicUrl(path);
+ $("imageUrl").value=data.publicUrl;$("uploadStatus").textContent="Upload berjaya. URL gambar telah dimasukkan.";
+}
+
 function initializeSupabase(){
  if(!window.supabase){setStatus("authStatus","Supabase gagal dimuatkan. Semak internet dan refresh.");showSection("auth");return}
  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -127,7 +405,7 @@ function initializeSupabase(){
   if(error){setStatus("authStatus",error.message);showSection("auth");return}
   if(data.session){user=data.session.user;loadRecords()}else showSection("auth");
  });
- sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;kits=[];communityMode=false;if(user)loadRecords();else showSection("auth")});
+ sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;kits=[];communityMode=false;if(user){loadRecords();startOnlinePresence();setLanguage(currentLanguage);}else{stopOnlinePresence();showSection("auth")}});
 }
 async function signIn(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
@@ -143,20 +421,20 @@ async function signUp(){
  const {data,error}=await sb.auth.signUp({email,password});
  setStatus("authStatus",error?error.message:(data.session?"Akaun berjaya dibuat.":"Akaun dibuat. Semak email untuk pengesahan sebelum log masuk."));
 }
-async function logout(){await sb.auth.signOut();user=null;kits=[];communityMode=false;showSection("auth")}
+async function logout(){stopOnlinePresence();await sb.auth.signOut();user=null;kits=[];communityMode=false;showSection("auth")}
 function toggleCommunity(){
  if(!isAdmin())return;
  communityMode=!communityMode;
  $("communityBtn").textContent="Community view: "+(communityMode?"ON":"OFF");
  loadRecords();
 }
-function toUi(row){return {id:row.id,ownerId:row.user_id,name:row.name,grade:row.grade||"Unclassified",scale:row.scale||"Non-scale",manufacturer:row.manufacturer||"Other",price:row.price==null?null:Number(row.price),priceNote:row.price_note||"exact",status:row.status,source:row.source||"",notes:row.notes||"",imageUrl:row.image_url||"",purchaseDate:row.purchase_date||""}}
-function toDb(k){return {name:k.name,grade:k.grade,scale:k.scale,manufacturer:k.manufacturer,status:k.status,price:k.price,currency:"MYR",price_note:k.priceNote||"exact",purchase_date:k.purchaseDate||null,image_url:k.imageUrl||null,source:k.source||null,notes:k.notes||null}}
+function toUi(row){return {id:row.id,ownerId:row.user_id,name:row.name,grade:row.grade||"Unclassified",scale:row.scale||"Non-scale",manufacturer:row.manufacturer||"Other",price:row.price==null?null:Number(row.price),priceNote:row.price_note||"exact",status:row.status,source:row.source||"",notes:row.notes||"",imageUrl:row.image_url||"",purchaseDate:row.purchase_date||"",isPublic:!!row.is_public}}
+function toDb(k){return {name:k.name,grade:k.grade,scale:k.scale,manufacturer:k.manufacturer,status:k.status,price:k.price,currency:"MYR",price_note:k.priceNote||"exact",purchase_date:k.purchaseDate||null,image_url:k.imageUrl||null,source:k.source||null,notes:k.notes||null,is_public:!!k.isPublic}}
 async function loadRecords(){
  if(!user||!sb||loadingRecords)return;
  loadingRecords=true;showSection("app");
  $("signedInAs").textContent=(isAdmin()?"FOUNDER / ADMIN · ":"SIGNED IN · ")+user.email;
- $("communityBtn").classList.toggle("hidden",!isAdmin());
+ $("communityBtn").classList.toggle("hidden",!isAdmin());$("adminTab").classList.toggle("hidden",!isAdmin());
  $("communityBtn").textContent="Community view: "+(communityMode?"ON":"OFF");
  $("collectionHeading").textContent=communityMode?"COMMUNITY COLLECTIONS":"MY COLLECTION";
  setStatus("dbStatus","Mengambil data daripada Supabase...");
@@ -174,17 +452,17 @@ function render(){
  const grades=[...new Set(kits.map(k=>k.grade))].sort();$("gradeFilter").innerHTML='<option value="all">Semua grade</option>'+grades.map(x=>`<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");$("gradeFilter").value=g;
  let a=kits.filter(k=>(f==="all"||k.status===f)&&(g==="all"||k.grade===g)&&[k.name,k.manufacturer,k.grade,k.scale,k.notes].join(" ").toLowerCase().includes(q));
  a.sort((x,y)=>s==="price"?(x.price??Infinity)-(y.price??Infinity):x.name.localeCompare(y.name));
- $("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail('${k.id}')"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Klik untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)} · ${escapeHtml(k.scale)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">${labels[k.status]||k.status}</span></div><div class="body"><small>${escapeHtml(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${escapeHtml(k.notes)}</small></div><div class="actions">${k.ownerId===user.id?`<button onclick="event.stopPropagation();editRecord('${k.id}')">Edit</button><button class="danger" onclick="event.stopPropagation();deleteRecord('${k.id}')">Padam</button>`:"<small>Rekod ahli komuniti · paparan sahaja</small>"}</div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';
+ $("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail('${k.id}')"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Klik untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)} · ${escapeHtml(k.scale)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">${labels[k.status]||k.status}${k.isPublic?" · SHARED":""}</span></div><div class="body"><small>${escapeHtml(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${escapeHtml(k.notes)}</small></div><div class="actions">${k.ownerId===user.id?`<button onclick="event.stopPropagation();editRecord('${k.id}')">Edit</button><button class="danger" onclick="event.stopPropagation();deleteRecord('${k.id}')">Padam</button>`:"<small>Rekod ahli komuniti · paparan sahaja</small>"}</div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';
  $("total").textContent=kits.length;$("backlog").textContent=kits.filter(k=>k.status==="Backlog").length;$("shipping").textContent=kits.filter(k=>k.status==="Shipping").length;
- let sum=kits.filter(k=>k.price!=null&&k.status!=="Wishlist").reduce((n,k)=>n+Number(k.price),0);$("spent").textContent="RM"+sum.toLocaleString("en-MY")+(kits.some(k=>k.priceNote==="plus"&&k.status!=="Wishlist")?"+":"");
+ let sum=kits.filter(k=>k.price!=null&&k.status!=="Wishlist").reduce((n,k)=>n+Number(k.price),0);$("spent").textContent="RM"+sum.toLocaleString("en-MY")+(kits.some(k=>k.priceNote==="plus"&&k.status!=="Wishlist")?"+":"");$("adminRecords").textContent=kits.length;$("adminMembers").textContent=new Set(kits.map(k=>k.ownerId)).size;$("adminShared").textContent=kits.filter(k=>k.isPublic).length;renderWishlist();
 }
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function openForm(){$("f").reset();$("recordId").value="";$("heading").textContent="Tambah model";$("modal").classList.add("open")}
+function openForm(status){$("f").reset();$("recordId").value="";$("heading").textContent="Tambah model";if(status)$("status").value=status;$("modal").classList.add("open")}
 function closeForm(){$("modal").classList.remove("open")}
-function editRecord(id){let k=kits.find(x=>x.id===id);if(!k||(!isAdmin()&&k.ownerId!==user.id)||(isAdmin()&&communityMode&&k.ownerId!==user.id))return alert("Edit rekod ahli lain tidak dibuka dalam paparan komuniti.");openForm();$("heading").textContent="Edit model";$("recordId").value=k.id;["name","grade","scale","manufacturer","status","price","source","notes"].forEach(x=>$(x).value=k[x]??"");$("priceNote").value=k.priceNote||"exact";$("imageUrl").value=k.imageUrl||"";$("purchaseDate").value=k.purchaseDate||""}
+function editRecord(id){let k=kits.find(x=>x.id===id);if(!k||(!isAdmin()&&k.ownerId!==user.id)||(isAdmin()&&communityMode&&k.ownerId!==user.id))return alert("Edit rekod ahli lain tidak dibuka dalam paparan komuniti.");openForm();$("heading").textContent="Edit model";$("recordId").value=k.id;["name","grade","scale","manufacturer","status","price","source","notes"].forEach(x=>$(x).value=k[x]??"");$("priceNote").value=k.priceNote||"exact";$("imageUrl").value=k.imageUrl||"";$("purchaseDate").value=k.purchaseDate||"";$("isPublic").checked=!!k.isPublic}
 async function saveRecord(e){
  e.preventDefault();if(!user)return;const id=$("recordId").value;
- const k={name:$("name").value.trim(),grade:$("grade").value,scale:$("scale").value,manufacturer:$("manufacturer").value,status:$("status").value,price:$("price").value===""?null:Number($("price").value),priceNote:$("priceNote").value,purchaseDate:$("purchaseDate").value,source:$("source").value.trim(),imageUrl:$("imageUrl").value.trim(),notes:$("notes").value.trim()};
+ const k={name:$("name").value.trim(),grade:$("grade").value,scale:$("scale").value,manufacturer:$("manufacturer").value,status:$("status").value,price:$("price").value===""?null:Number($("price").value),priceNote:$("priceNote").value,purchaseDate:$("purchaseDate").value,source:$("source").value.trim(),imageUrl:$("imageUrl").value.trim(),notes:$("notes").value.trim(),isPublic:$("isPublic").checked};
  $("saveBtn").disabled=true;$("saveBtn").textContent="Menyimpan...";
  let payload=toDb(k);
  let result=id?await sb.from("gunpla_collection").update(payload).eq("id",id).eq("user_id",user.id).select("*").single():await sb.from("gunpla_collection").insert({...payload,user_id:user.id}).select("*").single();
@@ -192,7 +470,7 @@ async function saveRecord(e){
  if(result.error){alert("Gagal menyimpan: "+result.error.message);return}
  if(id)kits=kits.map(x=>x.id===id?toUi(result.data):x);else kits.push(toUi(result.data));closeForm();render();setStatus("dbStatus","Online · perubahan berjaya disimpan.");
 }
-function showDetail(id){let k=kits.find(x=>x.id===id);if(!k)return;activeDetailId=id;$("dname").textContent=k.name;$("dgrade").textContent=k.grade;$("dscale").textContent=k.scale;$("dmanufacturer").textContent=k.manufacturer;$("dstatus").textContent=labels[k.status]||k.status;$("dprice").textContent=k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"");$("dsource").textContent=k.source||"Belum direkodkan";$("dnotes").textContent=k.notes||"";if(k.imageUrl){$("dimage").src=k.imageUrl;$("dimage").classList.remove("hidden");$("dplaceholder").classList.add("hidden")}else{$("dimage").classList.add("hidden");$("dplaceholder").classList.remove("hidden")}$("detailModal").classList.add("open")}
+function showDetail(id){let k=kits.find(x=>x.id===id);if(!k)return;activeDetailId=id;$("dname").textContent=k.name;$("dgrade").textContent=k.grade;$("dscale").textContent=k.scale;$("dmanufacturer").textContent=k.manufacturer;$("dstatus").textContent=labels[k.status]||k.status;$("dprice").textContent=k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"");$("dsource").textContent=k.source||"Belum direkodkan";$("dnotes").textContent=k.notes||"";if(k.imageUrl){$("dimage").src=k.imageUrl;$("dimage").classList.remove("hidden");$("dplaceholder").classList.add("hidden")}else{$("dimage").classList.add("hidden");$("dplaceholder").classList.remove("hidden")}$("detailModal").querySelectorAll(".foot button").forEach((b,i)=>b.classList.toggle("hidden",i===2&&kits.find(x=>x.id===id)?.ownerId!==user.id));$("detailModal").classList.add("open")}
 function closeDetail(){$("detailModal").classList.remove("open")}
 function editFromDetail(){let id=activeDetailId;closeDetail();editRecord(id)}
 async function deleteFromDetail(){if(activeDetailId)await deleteRecord(activeDetailId);closeDetail()}
