@@ -41,19 +41,6 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
 <header><div class="top"><div><h1>AEGIS // GUNPLA ARCHIVE</h1><p>COLLECTION DATABASE · BACKLOG CONTROL · ONLINE SYNC</p></div><div class="top"><span id="connectionBadge" class="badge">Belum disambungkan</span><button id="logoutBtn" class="hidden" onclick="logout()">Log keluar</button></div></div></header>
 
 <main>
-<section id="setup" class="authwrap">
- <div class="panel">
-  <h2>Sambungkan Supabase</h2>
-  <p class="muted">Masukkan Project URL dan Publishable Key. Maklumat ini disimpan dalam browser ini sahaja. Pada peranti lain, buat konfigurasi sekali lagi.</p>
-  <div class="authgrid">
-   <div class="field"><label>SUPABASE PROJECT URL</label><input id="projectUrl" placeholder="https://your-project.supabase.co"></div>
-   <div class="field"><label>SUPABASE PUBLISHABLE KEY</label><input id="publishableKey" placeholder="sb_publishable_..." autocomplete="off"></div>
-   <button class="primary" onclick="connectSupabase()">Simpan & Sambung</button>
-   <div class="statusline" id="setupStatus">Gunakan publishable key sahaja. Jangan masukkan secret/service_role key.</div>
-  </div>
- </div>
-</section>
-
 <section id="auth" class="authwrap hidden">
  <div class="panel">
   <h2 id="authTitle">Log masuk AEGIS</h2>
@@ -63,14 +50,13 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
    <div class="field"><label>PASSWORD</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Password"></div>
    <button class="primary" id="authSubmit" onclick="signIn()">Log masuk</button>
    <button id="signupBtn" onclick="signUp()">Daftar akaun baharu</button>
-   <button onclick="changeConfig()">Tukar konfigurasi Supabase</button>
    <div class="statusline" id="authStatus">Jika baru daftar, semak email untuk pengesahan jika diminta.</div>
   </div>
  </div>
 </section>
 
 <section id="app" class="hidden">
- <div class="top"><div><h2>COMMAND CENTER</h2><small id="signedInAs"></small></div><div class="toolbar"><button class="primary" onclick="openForm()">+ Tambah Gundam</button><button onclick="syncNow()">Sync</button></div></div>
+ <div class="top"><div><h2>COMMAND CENTER</h2><small id="signedInAs"></small></div><div class="toolbar"><button id="communityBtn" onclick="toggleCommunity()" class="hidden">Community view: OFF</button><button class="primary" onclick="openForm()">+ Tambah Gundam</button><button onclick="syncNow()">Sync</button><button onclick="logout()">Log keluar</button></div></div>
  <div class="stats">
   <div class="stat"><small>Jumlah koleksi</small><strong id="total">0</strong></div>
   <div class="stat"><small>Backlog</small><strong id="backlog">0</strong></div>
@@ -83,9 +69,9 @@ button:disabled{opacity:.5;cursor:not-allowed}.primary{background:#087e9c;border
   <select id="gradeFilter" onchange="render()"><option value="all">Semua grade</option></select>
   <select id="sort" onchange="render()"><option value="name">Susun nama</option><option value="price">Harga rendah dahulu</option></select>
  </div>
- <div class="top"><h3>ACTIVE COLLECTION</h3><small id="count"></small></div>
+ <div class="top"><h3 id="collectionHeading">MY COLLECTION</h3><small id="count"></small></div>
  <div class="grid" id="cards"></div>
- <div class="panel" style="margin-top:18px"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p></div>
+ <div class="panel" style="margin-top:18px"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p><p class="note">Setiap akaun mempunyai ruang koleksi peribadi. Admin boleh melihat semua koleksi melalui Community view.</p></div>
  <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
 </section>
 </main>
@@ -126,26 +112,22 @@ const seed=[
 {name:"Nu Gundam Fukuoka GK",grade:"GK / Resin",scale:"Non-scale",manufacturer:"Dragon Tiger Model",price:null,price_note:"unknown",status:"Shipping",source:"Online",notes:"Versi Dragon Tiger Model GK, bukan Bandai standard. Harga belum diberi.",image_url:null}
 ];
 const $=id=>document.getElementById(id);
-let sb=null,user=null,kits=[],activeDetailId=null,loadingRecords=false;
+const SUPABASE_URL="https://erlszssuvepymodxrrfo.supabase.co";
+const SUPABASE_KEY="sb_publishable_PDZ1UgBmpZNhX5LYgU2oEw_pZboZ5hY";
+let sb=null,user=null,kits=[],activeDetailId=null,loadingRecords=false,communityMode=false;
+const isAdmin=()=>user?.app_metadata?.role==="admin";
 const labels={Backlog:"BACKLOG",Shipping:"IN TRANSIT",Completed:"COMPLETED",Wishlist:"WISHLIST"};
 function setStatus(el,msg){$(el).textContent=msg}
-function showSection(id){["setup","auth","app"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
-function connectSupabase(){
- const url=$("projectUrl").value.trim(),key=$("publishableKey").value.trim();
- if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)||!key.startsWith("sb_publishable_")){setStatus("setupStatus","Semak URL projek dan pastikan key bermula dengan sb_publishable_.");return}
- localStorage.setItem("aegisSupabaseUrl",url);localStorage.setItem("aegisSupabaseKey",key);
- initializeSupabase(url,key);
-}
-function changeConfig(){showSection("setup");$("projectUrl").value=localStorage.getItem("aegisSupabaseUrl")||"";$("publishableKey").value=localStorage.getItem("aegisSupabaseKey")||""}
-function initializeSupabase(url,key){
- if(!window.supabase){setStatus("setupStatus","Library Supabase gagal dimuatkan. Semak sambungan internet dan refresh.");return}
- sb=window.supabase.createClient(url,key);
- $("connectionBadge").textContent="Supabase connected";
+function showSection(id){["auth","app"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function initializeSupabase(){
+ if(!window.supabase){setStatus("authStatus","Supabase gagal dimuatkan. Semak internet dan refresh.");showSection("auth");return}
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ $("connectionBadge").textContent="AEGIS COMMUNITY · ONLINE";
  sb.auth.getSession().then(({data,error})=>{
   if(error){setStatus("authStatus",error.message);showSection("auth");return}
   if(data.session){user=data.session.user;loadRecords()}else showSection("auth");
  });
- sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;if(user)loadRecords();else{kits=[];showSection("auth")}});
+ sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;kits=[];communityMode=false;if(user)loadRecords();else showSection("auth")});
 }
 async function signIn(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
@@ -161,18 +143,30 @@ async function signUp(){
  const {data,error}=await sb.auth.signUp({email,password});
  setStatus("authStatus",error?error.message:(data.session?"Akaun berjaya dibuat.":"Akaun dibuat. Semak email untuk pengesahan sebelum log masuk."));
 }
-async function logout(){await sb.auth.signOut();user=null;kits=[];showSection("auth")}
-function toUi(row){return {id:row.id,name:row.name,grade:row.grade||"Unclassified",scale:row.scale||"Non-scale",manufacturer:row.manufacturer||"Other",price:row.price==null?null:Number(row.price),priceNote:row.price_note||"exact",status:row.status,source:row.source||"",notes:row.notes||"",imageUrl:row.image_url||"",purchaseDate:row.purchase_date||""}}
-function toDb(k){return {name:k.name,grade:k.grade,scale:k.scale,manufacturer:k.manufacturer,status:k.status,price:k.price,price_note:k.priceNote||"exact",purchase_date:k.purchaseDate||null,image_url:k.imageUrl||null,source:k.source||null,notes:k.notes||null}}
+async function logout(){await sb.auth.signOut();user=null;kits=[];communityMode=false;showSection("auth")}
+function toggleCommunity(){
+ if(!isAdmin())return;
+ communityMode=!communityMode;
+ $("communityBtn").textContent="Community view: "+(communityMode?"ON":"OFF");
+ loadRecords();
+}
+function toUi(row){return {id:row.id,ownerId:row.user_id,name:row.name,grade:row.grade||"Unclassified",scale:row.scale||"Non-scale",manufacturer:row.manufacturer||"Other",price:row.price==null?null:Number(row.price),priceNote:row.price_note||"exact",status:row.status,source:row.source||"",notes:row.notes||"",imageUrl:row.image_url||"",purchaseDate:row.purchase_date||""}}
+function toDb(k){return {name:k.name,grade:k.grade,scale:k.scale,manufacturer:k.manufacturer,status:k.status,price:k.price,currency:"MYR",price_note:k.priceNote||"exact",purchase_date:k.purchaseDate||null,image_url:k.imageUrl||null,source:k.source||null,notes:k.notes||null}}
 async function loadRecords(){
- if(!user||!sb||loadingRecords)return;loadingRecords=true;showSection("app");$("signedInAs").textContent="SIGNED IN: "+user.email;setStatus("dbStatus","Mengambil data daripada Supabase...");
- const {data,error}=await sb.from("gunpla_collection").select("*").order("created_at",{ascending:true});
+ if(!user||!sb||loadingRecords)return;
+ loadingRecords=true;showSection("app");
+ $("signedInAs").textContent=(isAdmin()?"FOUNDER / ADMIN · ":"SIGNED IN · ")+user.email;
+ $("communityBtn").classList.toggle("hidden",!isAdmin());
+ $("communityBtn").textContent="Community view: "+(communityMode?"ON":"OFF");
+ $("collectionHeading").textContent=communityMode?"COMMUNITY COLLECTIONS":"MY COLLECTION";
+ setStatus("dbStatus","Mengambil data daripada Supabase...");
+ let query=sb.from("gunpla_collection").select("*").order("created_at",{ascending:true});
+ if(!isAdmin()||!communityMode)query=query.eq("user_id",user.id);
+ const {data,error}=await query;
  if(error){setStatus("dbStatus","Ralat memuatkan data: "+error.message);loadingRecords=false;return}
  kits=(data||[]).map(toUi);
- if(kits.length===0){const old=JSON.parse(localStorage.getItem("aegisArchive")||"null");const initial=Array.isArray(old)&&old.length?old.map(oldToDb):seed;
-  if(initial.length){const {data:inserted,error:insertError}=await sb.from("gunpla_collection").insert(initial).select("*");if(insertError){setStatus("dbStatus","Database kosong. Import awal gagal: "+insertError.message);render();loadingRecords=false;return}kits=(inserted||[]).map(toUi)}
- }
- setStatus("dbStatus","Online · "+kits.length+" rekod disimpan dalam Supabase. Sync aktif untuk akaun ini.");render();loadingRecords=false;
+ setStatus("dbStatus","Online · "+kits.length+" rekod dipaparkan. Had setiap akaun: 100 model.");
+ render();loadingRecords=false;
 }
 function oldToDb(k){let grade=k.grade||({ "MGSD":"MGSD","HG":"HG","RG":"RG","GK":"GK / Resin"}[k.scale]||"Unclassified");let scale=({"MGSD":"Non-scale","Model kit":"Non-scale","GK":"Non-scale","HG":"1/144","RG":"1/144"}[k.scale]||k.scale||"Non-scale");let manufacturer=k.manufacturer||k.brand||"Other";let status=({backlog:"Backlog",shipping:"Shipping",completed:"Completed",wishlist:"Wishlist"})[k.status]||k.status||"Backlog";return {name:k.name,grade,scale,manufacturer,status,price:k.price??null,price_note:k.priceNote==="plus"?"plus":k.priceNote==="unknown"?"unknown":"exact",source:k.source||null,notes:k.notes||null,image_url:k.image||null}}
 function render(){
@@ -180,19 +174,20 @@ function render(){
  const grades=[...new Set(kits.map(k=>k.grade))].sort();$("gradeFilter").innerHTML='<option value="all">Semua grade</option>'+grades.map(x=>`<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");$("gradeFilter").value=g;
  let a=kits.filter(k=>(f==="all"||k.status===f)&&(g==="all"||k.grade===g)&&[k.name,k.manufacturer,k.grade,k.scale,k.notes].join(" ").toLowerCase().includes(q));
  a.sort((x,y)=>s==="price"?(x.price??Infinity)-(y.price??Infinity):x.name.localeCompare(y.name));
- $("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail('${k.id}')"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Klik untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)} · ${escapeHtml(k.scale)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">${labels[k.status]||k.status}</span></div><div class="body"><small>${escapeHtml(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${escapeHtml(k.notes)}</small></div><div class="actions"><button onclick="event.stopPropagation();editRecord('${k.id}')">Edit</button><button class="danger" onclick="event.stopPropagation();deleteRecord('${k.id}')">Padam</button></div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';
+ $("count").textContent=a.length+" rekod";$("cards").innerHTML=a.length?a.map(k=>`<article class="card" onclick="showDetail('${k.id}')"><div class="thumb">${k.imageUrl?`<img src="${escapeHtml(k.imageUrl)}" alt="${escapeHtml(k.name)}" onerror="this.parentElement.textContent='Gambar tidak dapat dimuatkan'">`:"Klik untuk lihat butiran model"}</div><div class="cardhead"><div><div class="code">${escapeHtml(k.manufacturer)} · ${escapeHtml(k.grade)} · ${escapeHtml(k.scale)}</div><h3>${escapeHtml(k.name)}</h3></div><span class="tag">${labels[k.status]||k.status}</span></div><div class="body"><small>${escapeHtml(k.source||"Sumber belum direkodkan")}</small><div class="price">${k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"")}</div><small>${escapeHtml(k.notes)}</small></div><div class="actions">${k.ownerId===user.id?`<button onclick="event.stopPropagation();editRecord('${k.id}')">Edit</button><button class="danger" onclick="event.stopPropagation();deleteRecord('${k.id}')">Padam</button>`:"<small>Rekod ahli komuniti · paparan sahaja</small>"}</div></article>`).join(""):'<div class="empty">Tiada model ditemui.</div>';
  $("total").textContent=kits.length;$("backlog").textContent=kits.filter(k=>k.status==="Backlog").length;$("shipping").textContent=kits.filter(k=>k.status==="Shipping").length;
  let sum=kits.filter(k=>k.price!=null&&k.status!=="Wishlist").reduce((n,k)=>n+Number(k.price),0);$("spent").textContent="RM"+sum.toLocaleString("en-MY")+(kits.some(k=>k.priceNote==="plus"&&k.status!=="Wishlist")?"+":"");
 }
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function openForm(){$("f").reset();$("recordId").value="";$("heading").textContent="Tambah model";$("modal").classList.add("open")}
 function closeForm(){$("modal").classList.remove("open")}
-function editRecord(id){let k=kits.find(x=>x.id===id);if(!k)return;openForm();$("heading").textContent="Edit model";$("recordId").value=k.id;["name","grade","scale","manufacturer","status","price","source","notes"].forEach(x=>$(x).value=k[x]??"");$("priceNote").value=k.priceNote||"exact";$("imageUrl").value=k.imageUrl||"";$("purchaseDate").value=k.purchaseDate||""}
+function editRecord(id){let k=kits.find(x=>x.id===id);if(!k||(!isAdmin()&&k.ownerId!==user.id)||(isAdmin()&&communityMode&&k.ownerId!==user.id))return alert("Edit rekod ahli lain tidak dibuka dalam paparan komuniti.");openForm();$("heading").textContent="Edit model";$("recordId").value=k.id;["name","grade","scale","manufacturer","status","price","source","notes"].forEach(x=>$(x).value=k[x]??"");$("priceNote").value=k.priceNote||"exact";$("imageUrl").value=k.imageUrl||"";$("purchaseDate").value=k.purchaseDate||""}
 async function saveRecord(e){
  e.preventDefault();if(!user)return;const id=$("recordId").value;
  const k={name:$("name").value.trim(),grade:$("grade").value,scale:$("scale").value,manufacturer:$("manufacturer").value,status:$("status").value,price:$("price").value===""?null:Number($("price").value),priceNote:$("priceNote").value,purchaseDate:$("purchaseDate").value,source:$("source").value.trim(),imageUrl:$("imageUrl").value.trim(),notes:$("notes").value.trim()};
  $("saveBtn").disabled=true;$("saveBtn").textContent="Menyimpan...";
- let result=id?await sb.from("gunpla_collection").update(toDb(k)).eq("id",id).select("*").single():await sb.from("gunpla_collection").insert(toDb(k)).select("*").single();
+ let payload=toDb(k);
+ let result=id?await sb.from("gunpla_collection").update(payload).eq("id",id).eq("user_id",user.id).select("*").single():await sb.from("gunpla_collection").insert({...payload,user_id:user.id}).select("*").single();
  $("saveBtn").disabled=false;$("saveBtn").textContent="Simpan ke database";
  if(result.error){alert("Gagal menyimpan: "+result.error.message);return}
  if(id)kits=kits.map(x=>x.id===id?toUi(result.data):x);else kits.push(toUi(result.data));closeForm();render();setStatus("dbStatus","Online · perubahan berjaya disimpan.");
@@ -201,12 +196,11 @@ function showDetail(id){let k=kits.find(x=>x.id===id);if(!k)return;activeDetailI
 function closeDetail(){$("detailModal").classList.remove("open")}
 function editFromDetail(){let id=activeDetailId;closeDetail();editRecord(id)}
 async function deleteFromDetail(){if(activeDetailId)await deleteRecord(activeDetailId);closeDetail()}
-async function deleteRecord(id){let k=kits.find(x=>x.id===id);if(!k||!confirm("Padam "+k.name+" daripada database?"))return;const {error}=await sb.from("gunpla_collection").delete().eq("id",id);if(error){alert("Gagal padam: "+error.message);return}kits=kits.filter(x=>x.id!==id);render();setStatus("dbStatus","Rekod dipadam daripada Supabase.")}
+async function deleteRecord(id){let k=kits.find(x=>x.id===id);if(k&&k.ownerId!==user.id)return alert("Padam rekod ahli lain tidak dibenarkan dari paparan komuniti.");if(!k||!confirm("Padam "+k.name+" daripada database?"))return;const {error}=await sb.from("gunpla_collection").delete().eq("id",id);if(error){alert("Gagal padam: "+error.message);return}kits=kits.filter(x=>x.id!==id);render();setStatus("dbStatus","Rekod dipadam daripada Supabase.")}
 function searchImage(){let k=kits.find(x=>x.id===activeDetailId);if(k)window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(k.name+" model kit"),"_blank")}
 async function syncNow(){await loadRecords()}
 function exportData(){const blob=new Blob([JSON.stringify(kits,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="aegis-gunpla-backup.json";a.click();URL.revokeObjectURL(a.href)}
-function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const arr=JSON.parse(reader.result);if(!Array.isArray(arr))throw Error("Format JSON tidak sah");for(const old of arr){const row=oldToDb(old);const {error}=await sb.from("gunpla_collection").insert(row);if(error)throw error}await loadRecords();alert("Import selesai.")}catch(err){alert("Import gagal: "+err.message)}};reader.readAsText(file);e.target.value=""}
-const savedUrl=localStorage.getItem("aegisSupabaseUrl"),savedKey=localStorage.getItem("aegisSupabaseKey");
-if(savedUrl&&savedKey){$("projectUrl").value=savedUrl;$("publishableKey").value=savedKey;initializeSupabase(savedUrl,savedKey)}else showSection("setup");
+function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const arr=JSON.parse(reader.result);if(!Array.isArray(arr))throw Error("Format JSON tidak sah");for(const old of arr){const row=oldToDb(old);const {error}=await sb.from("gunpla_collection").insert({...row,user_id:user.id});if(error)throw error}await loadRecords();alert("Import selesai.")}catch(err){alert("Import gagal: "+err.message)}};reader.readAsText(file);e.target.value=""}
+initializeSupabase();
 </script>
 </body></html>
