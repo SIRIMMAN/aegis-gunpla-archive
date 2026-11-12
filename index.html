@@ -325,7 +325,12 @@ function switchView(view){
  if(view==="community")loadCommunity();
  if(view==="leaderboard")loadLeaderboard();
  if(view==="profile")loadProfile();
- if(view==="support"){loadSupportMessages();if(isAdmin())loadAdminSupport();}
+ if(view==="support"){
+  const inbox=$("adminSupportPanel");
+  if(inbox)inbox.classList.toggle("hidden",!isAdmin());
+  loadSupportMessages();
+  if(isAdmin())loadAdminSupport();
+ }
  if(view==="admin"&&!isAdmin())switchView("collection");
 }
 function renderWishlist(){
