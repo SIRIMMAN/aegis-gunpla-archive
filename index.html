@@ -152,6 +152,12 @@ button.primary{box-shadow:0 3px 0 rgba(80,48,10,.35),0 0 16px rgba(224,189,104,.
  .stat{padding:12px}
 }
 
+
+/* Founder Activity Monitor */
+.activityrow{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(150px,1.4fr) minmax(120px,.9fr);gap:10px;align-items:center;padding:12px;border-bottom:1px solid rgba(91,143,185,.2)}
+.activityrow:last-child{border-bottom:0}.activityrow strong{display:block;overflow-wrap:anywhere}.activityrow small{display:block;color:#9bbbd7;overflow-wrap:anywhere}
+.activitytype{display:inline-block;border:1px solid rgba(224,189,104,.45);color:#e0bd68;border-radius:4px;padding:3px 7px;font-size:10px;letter-spacing:.7px}
+@media(max-width:650px){.activityrow{grid-template-columns:1fr;gap:5px}}
 </style>
 </head>
 <body>
@@ -249,6 +255,23 @@ button.primary{box-shadow:0 3px 0 rgba(80,48,10,.35),0 0 16px rgba(224,189,104,.
    <div class="stat"><small>Had setiap akaun</small><strong>100</strong></div>
   </div>
   <div class="panel"><b>Database status</b><p class="muted" id="dbStatus">Menunggu sambungan...</p><p class="note">Founder boleh melihat semua rekod melalui akses admin. Pengurusan rekod ahli lain kekal read-only.</p></div>
+  <div class="panel" style="margin-top:18px">
+   <div class="sectionhead"><div><div class="eyebrow">FOUNDER ONLY // LIVE NETWORK</div><h3>LIVE ONLINE USERS</h3><p class="muted">Akaun yang sedang aktif pada AEGIS. Senarai dikemas kini melalui Supabase Presence.</p></div><span class="activitytype" style="border-color:rgba(90,220,160,.5);color:#70e0ae">REALTIME</span></div>
+   <div id="founderOnlineUsers" class="memberlist"><p class="muted">Menunggu sambungan Presence...</p></div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+   <div class="sectionhead"><div><div class="eyebrow">FOUNDER ONLY // PERSONNEL FILES</div><h3>ACCOUNT DIRECTORY</h3><p class="muted">Senarai akaun AEGIS, UUID dan aktiviti terakhir.</p></div><button onclick="loadFounderActivity()">Refresh</button></div>
+   <div class="stats">
+    <div class="stat"><small>Registered accounts</small><strong id="activityAccounts">0</strong></div>
+    <div class="stat"><small>Activity events</small><strong id="activityEvents">0</strong></div>
+    <div class="stat"><small>Latest activity</small><strong id="activityLatest" style="font-size:15px">—</strong></div>
+   </div>
+   <div id="founderAccountDirectory" class="memberlist"><p class="muted">Memuatkan direktori akaun...</p></div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+   <div class="sectionhead"><div><div class="eyebrow">AEGIS NETWORK // AUDIT TRAIL</div><h3>ACCOUNT ACTIVITY LOG</h3><p class="muted">Login, logout, pendaftaran, perubahan koleksi dan mesej sokongan.</p></div><button onclick="loadFounderActivity()">Refresh log</button></div>
+   <div id="founderActivityLog" class="memberlist"><p class="muted">Memuatkan aktiviti...</p></div>
+  </div>
   <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
  </section>
  <div class="panel" style="margin-top:18px"><b>AEGIS NETWORK STATUS</b><p class="muted" id="dbStatusMirror">Online · Community database</p><p class="note">Setiap akaun mengurus koleksi sendiri. Model hanya muncul dalam Community apabila pemilik mengaktifkan pilihan kongsi.</p></div>
@@ -326,17 +349,42 @@ function setLanguage(lang){
  $("supportHeading").textContent=t.supportHeading;$("supportIntro").textContent=t.supportIntro;$("supportSubjectLabel").textContent=t.subject;$("supportSend").textContent=t.send;$("supportMessage").placeholder=t.message;$("supportPrivacy").textContent=t.private;
 }
 let onlineChannel=null,onlineUsers=0;
+let presenceHeartbeat=null;
+function renderFounderOnlineUsers(){
+ const host=$("founderOnlineUsers");
+ if(!host||!isAdmin()||!onlineChannel)return;
+ const state=onlineChannel.presenceState()||{};
+ const rows=[];
+ Object.entries(state).forEach(([key,entries])=>{
+  (entries||[]).forEach(entry=>rows.push({user_id:entry.user_id||key,display_name:entry.display_name||"AEGIS Pilot",online_at:entry.online_at||null}));
+ });
+ const unique=[...new Map(rows.map(r=>[r.user_id,r])).values()];
+ host.innerHTML=unique.length?unique.map(r=>`<div class="activityrow"><div><strong>${escapeHtml(r.display_name)}</strong><small>${escapeHtml(r.user_id)}</small></div><div><span class="activitytype" style="border-color:rgba(90,220,160,.5);color:#70e0ae">ONLINE NOW</span><small>Live Supabase Presence</small></div><div><strong>Connected</strong><small>${r.online_at?new Date(r.online_at).toLocaleTimeString():"Active session"}</small></div></div>`).join(""):'<p class="muted">Tiada akaun lain sedang online. Senarai ini dikemas kini secara live.</p>';
+}
 function startOnlinePresence(){
  if(!sb||!user)return;
  if(onlineChannel){sb.removeChannel(onlineChannel);onlineChannel=null}
+ if(presenceHeartbeat){clearInterval(presenceHeartbeat);presenceHeartbeat=null}
  onlineChannel=sb.channel("aegis-online-presence",{config:{presence:{key:user.id}}});
  onlineChannel.on("presence",{event:"sync"},()=>{
   const state=onlineChannel.presenceState();onlineUsers=Object.keys(state).length;
   $("onlineCount").textContent=onlineUsers+" "+I18N[currentLanguage].online;
+  renderFounderOnlineUsers();
  });
- onlineChannel.subscribe(async status=>{if(status==="SUBSCRIBED")await onlineChannel.track({user_id:user.id,online_at:new Date().toISOString()})});
+ onlineChannel.subscribe(async status=>{
+  if(status==="SUBSCRIBED"){
+   const {data:profile}=await sb.from("aegis_profiles").select("display_name").eq("user_id",user.id).maybeSingle();
+   const displayName=profile?.display_name||user.user_metadata?.display_name||user.email?.split("@")[0]||"AEGIS Pilot";
+   await onlineChannel.track({user_id:user.id,display_name:displayName,online_at:new Date().toISOString()});
+   await sb.from("aegis_profiles").update({last_seen_at:new Date().toISOString()}).eq("user_id",user.id);
+   presenceHeartbeat=setInterval(async()=>{
+    if(!user||!sb)return;
+    await sb.from("aegis_profiles").update({last_seen_at:new Date().toISOString()}).eq("user_id",user.id);
+   },60000);
+  }
+ });
 }
-function stopOnlinePresence(){if(sb&&onlineChannel){sb.removeChannel(onlineChannel);onlineChannel=null}onlineUsers=0;$("onlineCount").textContent="0 "+I18N[currentLanguage].online}
+function stopOnlinePresence(){if(presenceHeartbeat){clearInterval(presenceHeartbeat);presenceHeartbeat=null}if(sb&&onlineChannel){sb.removeChannel(onlineChannel);onlineChannel=null}onlineUsers=0;$("onlineCount").textContent="0 "+I18N[currentLanguage].online;const host=$("founderOnlineUsers");if(host)host.innerHTML='<p class="muted">Presence disconnected.</p>'}
 let supportThreadId=null;
 async function loadSupportMessages(){
  if(!sb||!user)return;
@@ -363,7 +411,7 @@ async function sendSupportMessage(){
  }
  const {error}=await sb.from("aegis_support_messages").insert({thread_id:supportThreadId,sender_id:user.id,message});
  if(error){alert("Mesej gagal dihantar: "+error.message);return}
- $("supportMessage").value="";if(isAdmin())await openAdminThread(supportThreadId);else await loadSupportMessages();
+ $("supportMessage").value="";await logActivity("support_message_sent",{thread_id:supportThreadId});if(isAdmin())await openAdminThread(supportThreadId);else await loadSupportMessages();
 }
 async function loadAdminSupport(){
  if(!isAdmin())return;
@@ -378,6 +426,33 @@ async function openAdminThread(id){
  $("supportMessages").innerHTML=(msgs||[]).map(m=>`<div class="chatmsg ${m.sender_id===user.id?"mine":""}">${escapeHtml(m.message)}<small>${m.sender_id===user.id?"You":"Member"} · ${new Date(m.created_at).toLocaleString()}</small></div>`).join("");
  $("supportSubject").value="";
  switchView("support");
+}
+
+
+async function logActivity(eventType,details={}){
+ if(!sb||!user)return;
+ try{
+  await sb.from("aegis_activity_log").insert({user_id:user.id,event_type:eventType,details});
+  await sb.from("aegis_profiles").upsert({user_id:user.id,last_seen_at:new Date().toISOString()},{onConflict:"user_id"});
+ }catch(e){console.warn("AEGIS activity log:",e.message)}
+}
+async function loadFounderActivity(){
+ if(!isAdmin()||!sb)return;
+ $("founderAccountDirectory").innerHTML='<p class="muted">Memuatkan direktori akaun...</p>';
+ $("founderActivityLog").innerHTML='<p class="muted">Memuatkan aktiviti...</p>';
+ const [profilesResult,eventsResult]=await Promise.all([
+  sb.from("aegis_profiles").select("user_id,display_name,created_at,last_seen_at").order("created_at",{ascending:false}).limit(500),
+  sb.from("aegis_activity_log").select("id,user_id,event_type,details,created_at").order("created_at",{ascending:false}).limit(200)
+ ]);
+ if(profilesResult.error){$("founderAccountDirectory").textContent="Directory error: "+profilesResult.error.message;return}
+ if(eventsResult.error){$("founderActivityLog").textContent="Activity log error: "+eventsResult.error.message;return}
+ const profiles=profilesResult.data||[],events=eventsResult.data||[];
+ const names=Object.fromEntries(profiles.map(p=>[p.user_id,p.display_name||"AEGIS Pilot"]));
+ $("activityAccounts").textContent=profiles.length;
+ $("activityEvents").textContent=events.length;
+ $("activityLatest").textContent=events[0]?new Date(events[0].created_at).toLocaleString():"—";
+ $("founderAccountDirectory").innerHTML=profiles.map(p=>`<div class="activityrow"><div><strong>${escapeHtml(p.display_name||"AEGIS Pilot")}</strong><small>${escapeHtml(p.user_id)}</small></div><div><span class="activitytype">ACCOUNT</span><small>Registered: ${p.created_at?new Date(p.created_at).toLocaleString():"Unknown"}</small></div><div><strong>Last active</strong><small>${p.last_seen_at?new Date(p.last_seen_at).toLocaleString():"No activity recorded"}</small></div></div>`).join("")||'<p class="muted">Belum ada akaun profil.</p>';
+ $("founderActivityLog").innerHTML=events.map(e=>`<div class="activityrow"><div><strong>${escapeHtml(names[e.user_id]||"AEGIS Pilot")}</strong><small>${escapeHtml(e.user_id)}</small></div><div><span class="activitytype">${escapeHtml(String(e.event_type||"EVENT").replaceAll("_"," ").toUpperCase())}</span><small>${escapeHtml(JSON.stringify(e.details||{}))}</small></div><div><strong>${new Date(e.created_at).toLocaleString()}</strong><small>AEGIS audit event</small></div></div>`).join("")||'<p class="muted">Belum ada aktiviti direkodkan.</p>';
 }
 
 function switchView(view){
@@ -395,6 +470,7 @@ function switchView(view){
   if(isAdmin())loadAdminSupport();
  }
  if(view==="admin"&&!isAdmin())switchView("collection");
+ if(view==="admin"&&isAdmin())loadFounderActivity();
 }
 function renderWishlist(){
  const list=kits.filter(k=>k.status==="Wishlist");
@@ -437,7 +513,7 @@ async function saveProfile(){
  const payload={user_id:user.id,display_name:$("displayName").value.trim()||"AEGIS Pilot",avatar_url:$("avatarUrl").value.trim()||null,bio:$("bio").value.trim(),show_in_community:$("profilePublic").checked,updated_at:new Date().toISOString()};
  const {error}=await sb.from("aegis_profiles").upsert(payload,{onConflict:"user_id"});
  if(error){alert("Profil gagal disimpan: "+error.message);return}
- alert("Profil AEGIS berjaya disimpan.");loadProfile();
+ await logActivity("profile_updated",{display_name:payload.display_name,community_visible:payload.show_in_community});alert("Profil AEGIS berjaya disimpan.");loadProfile();
 }
 async function loadLeaderboard(){
  if(!sb||!user)return;
@@ -463,6 +539,7 @@ async function uploadModelImage(){
  if(error){$("uploadStatus").textContent="Upload gagal: "+error.message;return}
  const {data}=sb.storage.from("aegis-uploads").getPublicUrl(path);
  $("imageUrl").value=data.publicUrl;$("uploadStatus").textContent="Upload berjaya. URL gambar telah dimasukkan.";
+ await logActivity("image_uploaded",{file_name:file.name,file_type:file.type,file_size:file.size});
 }
 
 function initializeSupabase(){
@@ -473,7 +550,7 @@ function initializeSupabase(){
   if(error){setStatus("authStatus",error.message);showSection("auth");return}
   if(data.session){user=data.session.user;loadRecords()}else showSection("auth");
  });
- sb.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;kits=[];communityMode=false;if(user){loadRecords();startOnlinePresence();setLanguage(currentLanguage);}else{stopOnlinePresence();showSection("auth")}});
+ sb.auth.onAuthStateChange((event,session)=>{user=session?.user||null;kits=[];communityMode=false;if(user){if(event==="SIGNED_IN"){logActivity("login",{method:"email"});sb.from("aegis_profiles").upsert({user_id:user.id,last_seen_at:new Date().toISOString()},{onConflict:"user_id"});}loadRecords();startOnlinePresence();setLanguage(currentLanguage);}else{stopOnlinePresence();showSection("auth")}});
 }
 async function signIn(){
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
@@ -487,9 +564,9 @@ async function signUp(){
  if(!email||password.length<8){setStatus("authStatus","Masukkan email dan password sekurang-kurangnya 8 aksara.");return}
  setStatus("authStatus","Sedang mendaftar...");
  const {data,error}=await sb.auth.signUp({email,password});
- setStatus("authStatus",error?error.message:(data.session?"Akaun berjaya dibuat.":"Akaun dibuat. Semak email untuk pengesahan sebelum log masuk."));
+ setStatus("authStatus",error?error.message:(data.session?"Akaun berjaya dibuat.":"Akaun dibuat. Semak email untuk pengesahan sebelum log masuk."));if(!error&&data.session){user=data.session.user;await logActivity("account_registered",{method:"email"});}
 }
-async function logout(){stopOnlinePresence();await sb.auth.signOut();user=null;kits=[];communityMode=false;showSection("auth")}
+async function logout(){await logActivity("logout",{});stopOnlinePresence();await sb.auth.signOut();user=null;kits=[];communityMode=false;showSection("auth")}
 function toggleCommunity(){
  if(!isAdmin())return;
  communityMode=!communityMode;
@@ -536,17 +613,17 @@ async function saveRecord(e){
  let result=id?await sb.from("gunpla_collection").update(payload).eq("id",id).eq("user_id",user.id).select("*").single():await sb.from("gunpla_collection").insert({...payload,user_id:user.id}).select("*").single();
  $("saveBtn").disabled=false;$("saveBtn").textContent="Simpan ke database";
  if(result.error){alert("Gagal menyimpan: "+result.error.message);return}
- if(id)kits=kits.map(x=>x.id===id?toUi(result.data):x);else kits.push(toUi(result.data));closeForm();render();setStatus("dbStatus","Online · perubahan berjaya disimpan.");
+ if(id){kits=kits.map(x=>x.id===id?toUi(result.data):x);await logActivity("gunpla_updated",{model_name:k.name,record_id:id});}else{kits.push(toUi(result.data));await logActivity("gunpla_created",{model_name:k.name,grade:k.grade});}closeForm();render();setStatus("dbStatus","Online · perubahan berjaya disimpan.");
 }
 function showDetail(id){let k=kits.find(x=>x.id===id);if(!k)return;activeDetailId=id;$("dname").textContent=k.name;$("dgrade").textContent=k.grade;$("dscale").textContent=k.scale;$("dmanufacturer").textContent=k.manufacturer;$("dstatus").textContent=labels[k.status]||k.status;$("dprice").textContent=k.price==null?"Belum diketahui":"RM"+Number(k.price).toLocaleString("en-MY")+(k.priceNote==="plus"?"+":"");$("dsource").textContent=k.source||"Belum direkodkan";$("dnotes").textContent=k.notes||"";if(k.imageUrl){$("dimage").src=k.imageUrl;$("dimage").classList.remove("hidden");$("dplaceholder").classList.add("hidden")}else{$("dimage").classList.add("hidden");$("dplaceholder").classList.remove("hidden")}$("detailModal").querySelectorAll(".foot button").forEach((b,i)=>b.classList.toggle("hidden",i===2&&kits.find(x=>x.id===id)?.ownerId!==user.id));$("detailModal").classList.add("open")}
 function closeDetail(){$("detailModal").classList.remove("open")}
 function editFromDetail(){let id=activeDetailId;closeDetail();editRecord(id)}
 async function deleteFromDetail(){if(activeDetailId)await deleteRecord(activeDetailId);closeDetail()}
-async function deleteRecord(id){let k=kits.find(x=>x.id===id);if(k&&k.ownerId!==user.id)return alert("Padam rekod ahli lain tidak dibenarkan dari paparan komuniti.");if(!k||!confirm("Padam "+k.name+" daripada database?"))return;const {error}=await sb.from("gunpla_collection").delete().eq("id",id);if(error){alert("Gagal padam: "+error.message);return}kits=kits.filter(x=>x.id!==id);render();setStatus("dbStatus","Rekod dipadam daripada Supabase.")}
+async function deleteRecord(id){let k=kits.find(x=>x.id===id);if(k&&k.ownerId!==user.id)return alert("Padam rekod ahli lain tidak dibenarkan dari paparan komuniti.");if(!k||!confirm("Padam "+k.name+" daripada database?"))return;const {error}=await sb.from("gunpla_collection").delete().eq("id",id);if(error){alert("Gagal padam: "+error.message);return}kits=kits.filter(x=>x.id!==id);await logActivity("gunpla_deleted",{model_name:k.name,record_id:id});render();setStatus("dbStatus","Rekod dipadam daripada Supabase.")}
 function searchImage(){let k=kits.find(x=>x.id===activeDetailId);if(k)window.open("https://www.google.com/search?tbm=isch&q="+encodeURIComponent(k.name+" model kit"),"_blank")}
 async function syncNow(){await loadRecords()}
 function exportData(){const blob=new Blob([JSON.stringify(kits,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="aegis-gunpla-backup.json";a.click();URL.revokeObjectURL(a.href)}
-function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const arr=JSON.parse(reader.result);if(!Array.isArray(arr))throw Error("Format JSON tidak sah");for(const old of arr){const row=oldToDb(old);const {error}=await sb.from("gunpla_collection").insert({...row,user_id:user.id});if(error)throw error}await loadRecords();alert("Import selesai.")}catch(err){alert("Import gagal: "+err.message)}};reader.readAsText(file);e.target.value=""}
+function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const arr=JSON.parse(reader.result);if(!Array.isArray(arr))throw Error("Format JSON tidak sah");for(const old of arr){const row=oldToDb(old);const {error}=await sb.from("gunpla_collection").insert({...row,user_id:user.id});if(error)throw error}await logActivity("collection_imported",{record_count:arr.length});await loadRecords();alert("Import selesai.")}catch(err){alert("Import gagal: "+err.message)}};reader.readAsText(file);e.target.value=""}
 initializeSupabase();
 </script>
 </body></html>
