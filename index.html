@@ -157,6 +157,9 @@ button.primary{box-shadow:0 3px 0 rgba(80,48,10,.35),0 0 16px rgba(224,189,104,.
 .activityrow{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(150px,1.4fr) minmax(120px,.9fr);gap:10px;align-items:center;padding:12px;border-bottom:1px solid rgba(91,143,185,.2)}
 .activityrow:last-child{border-bottom:0}.activityrow strong{display:block;overflow-wrap:anywhere}.activityrow small{display:block;color:#9bbbd7;overflow-wrap:anywhere}
 .activitytype{display:inline-block;border:1px solid rgba(224,189,104,.45);color:#e0bd68;border-radius:4px;padding:3px 7px;font-size:10px;letter-spacing:.7px}
+#founderAccountDirectory .activityrow:hover{background:rgba(68,130,170,.10)}
+#founderAccountDirectory .activityrow:focus{outline:2px solid var(--c);outline-offset:-2px}
+#founderAccountDetail .activityrow{background:rgba(5,15,27,.32)}
 @media(max-width:650px){.activityrow{grid-template-columns:1fr;gap:5px}}
 </style>
 </head>
@@ -267,9 +270,23 @@ button.primary{box-shadow:0 3px 0 rgba(80,48,10,.35),0 0 16px rgba(224,189,104,.
     <div class="stat"><small>Latest activity</small><strong id="activityLatest" style="font-size:15px">—</strong></div>
    </div>
    <div id="founderAccountDirectory" class="memberlist"><p class="muted">Memuatkan direktori akaun...</p></div>
+   <div id="founderAccountDetail" class="panel hidden" style="margin-top:14px;background:#091727">
+    <div class="sectionhead"><div><div class="eyebrow">PERSONNEL FILE // SELECTED ACCOUNT</div><h3 id="founderDetailName">Account details</h3><p class="muted" id="founderDetailId"></p></div><button onclick="closeFounderAccountDetail()">Close</button></div>
+    <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+     <div class="stat"><small>Account events</small><strong id="founderDetailEvents">0</strong></div>
+     <div class="stat"><small>Last recorded activity</small><strong id="founderDetailLast" style="font-size:14px">—</strong></div>
+    </div>
+    <div id="founderDetailTimeline" class="memberlist"></div>
+   </div>
   </div>
   <div class="panel" style="margin-top:18px">
-   <div class="sectionhead"><div><div class="eyebrow">AEGIS NETWORK // AUDIT TRAIL</div><h3>ACCOUNT ACTIVITY LOG</h3><p class="muted">Login, logout, pendaftaran, perubahan koleksi dan mesej sokongan.</p></div><button onclick="loadFounderActivity()">Refresh log</button></div>
+   <div class="sectionhead"><div><div class="eyebrow">AEGIS NETWORK // AUDIT TRAIL</div><h3>ACCOUNT ACTIVITY LOG</h3><p class="muted">Timeline aktiviti mengikut masa. Pilih kategori untuk menapis rekod.</p></div><button onclick="loadFounderActivity()">Refresh log</button></div>
+   <div class="toolbar" style="align-items:center">
+    <select id="activityFilter" onchange="renderFounderActivityLog()" aria-label="Filter activity">
+     <option value="all">All activity</option><option value="auth">Login / Logout / Signup</option><option value="collection">Gunpla collection</option><option value="upload">Image uploads</option><option value="profile">Profile updates</option><option value="support">Support messages</option>
+    </select>
+    <input id="activitySearch" placeholder="Search account or activity..." oninput="renderFounderActivityLog()" style="flex:1;min-width:180px">
+   </div>
    <div id="founderActivityLog" class="memberlist"><p class="muted">Memuatkan aktiviti...</p></div>
   </div>
   <div class="toolbar"><button onclick="exportData()">Export backup JSON</button><button onclick="document.getElementById('file').click()">Import backup JSON</button><input id="file" type="file" accept="application/json" hidden onchange="importData(event)"></div>
@@ -436,23 +453,66 @@ async function logActivity(eventType,details={}){
   await sb.from("aegis_profiles").upsert({user_id:user.id,last_seen_at:new Date().toISOString()},{onConflict:"user_id"});
  }catch(e){console.warn("AEGIS activity log:",e.message)}
 }
+let founderProfilesCache=[],founderEventsCache=[];
+function eventCategory(type){
+ const t=String(type||"").toLowerCase();
+ if(["login","logout","signup","sign_up","registered"].some(x=>t.includes(x)))return "auth";
+ if(t.includes("upload")||t.includes("image"))return "upload";
+ if(t.includes("profile"))return "profile";
+ if(t.includes("support"))return "support";
+ if(["gunpla","collection","model","import","delete","update","create","add"].some(x=>t.includes(x)))return "collection";
+ return "other";
+}
+function activityRowHtml(e,names){
+ const name=names[e.user_id]||"AEGIS Pilot";
+ const type=String(e.event_type||"EVENT").replaceAll("_"," ").toUpperCase();
+ const details=JSON.stringify(e.details||{});
+ return `<div class="activityrow"><div><strong>${escapeHtml(name)}</strong><small>${escapeHtml(e.user_id)}</small></div><div><span class="activitytype">${escapeHtml(type)}</span><small>${escapeHtml(details)}</small></div><div><strong>${new Date(e.created_at).toLocaleString()}</strong><small>AEGIS activity timeline</small></div></div>`;
+}
+function renderFounderActivityLog(){
+ if(!isAdmin())return;
+ const filter=$("activityFilter")?.value||"all",search=($("activitySearch")?.value||"").toLowerCase();
+ const names=Object.fromEntries(founderProfilesCache.map(p=>[p.user_id,p.display_name||"AEGIS Pilot"]));
+ const filtered=founderEventsCache.filter(e=>{
+  const category=eventCategory(e.event_type);
+  const matchesFilter=filter==="all"||category===filter;
+  const haystack=[names[e.user_id],e.user_id,e.event_type,JSON.stringify(e.details||{})].join(" ").toLowerCase();
+  return matchesFilter&&(!search||haystack.includes(search));
+ });
+ $("founderActivityLog").innerHTML=filtered.map(e=>activityRowHtml(e,names)).join("")||'<p class="muted">Tiada aktiviti sepadan dengan tapisan ini.</p>';
+}
+function openFounderAccountDetail(userId){
+ if(!isAdmin())return;
+ const profile=founderProfilesCache.find(p=>p.user_id===userId);if(!profile)return;
+ const events=founderEventsCache.filter(e=>e.user_id===userId);
+ const names=Object.fromEntries(founderProfilesCache.map(p=>[p.user_id,p.display_name||"AEGIS Pilot"]));
+ $("founderDetailName").textContent=profile.display_name||"AEGIS Pilot";
+ $("founderDetailId").textContent=userId;
+ $("founderDetailEvents").textContent=events.length;
+ $("founderDetailLast").textContent=events[0]?new Date(events[0].created_at).toLocaleString():(profile.last_seen_at?new Date(profile.last_seen_at).toLocaleString():"No activity");
+ $("founderDetailTimeline").innerHTML=events.map(e=>activityRowHtml(e,names)).join("")||'<p class="muted">Belum ada aktiviti direkodkan untuk akaun ini.</p>';
+ $("founderAccountDetail").classList.remove("hidden");
+ $("founderAccountDetail").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function closeFounderAccountDetail(){$("founderAccountDetail")?.classList.add("hidden")}
 async function loadFounderActivity(){
  if(!isAdmin()||!sb)return;
  $("founderAccountDirectory").innerHTML='<p class="muted">Memuatkan direktori akaun...</p>';
  $("founderActivityLog").innerHTML='<p class="muted">Memuatkan aktiviti...</p>';
  const [profilesResult,eventsResult]=await Promise.all([
   sb.from("aegis_profiles").select("user_id,display_name,created_at,last_seen_at").order("created_at",{ascending:false}).limit(500),
-  sb.from("aegis_activity_log").select("id,user_id,event_type,details,created_at").order("created_at",{ascending:false}).limit(200)
+  sb.from("aegis_activity_log").select("id,user_id,event_type,details,created_at").order("created_at",{ascending:false}).limit(500)
  ]);
  if(profilesResult.error){$("founderAccountDirectory").textContent="Directory error: "+profilesResult.error.message;return}
  if(eventsResult.error){$("founderActivityLog").textContent="Activity log error: "+eventsResult.error.message;return}
- const profiles=profilesResult.data||[],events=eventsResult.data||[];
+ founderProfilesCache=profilesResult.data||[];founderEventsCache=eventsResult.data||[];
+ const profiles=founderProfilesCache,events=founderEventsCache;
  const names=Object.fromEntries(profiles.map(p=>[p.user_id,p.display_name||"AEGIS Pilot"]));
  $("activityAccounts").textContent=profiles.length;
  $("activityEvents").textContent=events.length;
  $("activityLatest").textContent=events[0]?new Date(events[0].created_at).toLocaleString():"—";
- $("founderAccountDirectory").innerHTML=profiles.map(p=>`<div class="activityrow"><div><strong>${escapeHtml(p.display_name||"AEGIS Pilot")}</strong><small>${escapeHtml(p.user_id)}</small></div><div><span class="activitytype">ACCOUNT</span><small>Registered: ${p.created_at?new Date(p.created_at).toLocaleString():"Unknown"}</small></div><div><strong>Last active</strong><small>${p.last_seen_at?new Date(p.last_seen_at).toLocaleString():"No activity recorded"}</small></div></div>`).join("")||'<p class="muted">Belum ada akaun profil.</p>';
- $("founderActivityLog").innerHTML=events.map(e=>`<div class="activityrow"><div><strong>${escapeHtml(names[e.user_id]||"AEGIS Pilot")}</strong><small>${escapeHtml(e.user_id)}</small></div><div><span class="activitytype">${escapeHtml(String(e.event_type||"EVENT").replaceAll("_"," ").toUpperCase())}</span><small>${escapeHtml(JSON.stringify(e.details||{}))}</small></div><div><strong>${new Date(e.created_at).toLocaleString()}</strong><small>AEGIS audit event</small></div></div>`).join("")||'<p class="muted">Belum ada aktiviti direkodkan.</p>';
+ $("founderAccountDirectory").innerHTML=profiles.map(p=>`<div class="activityrow" role="button" tabindex="0" style="cursor:pointer" onclick="openFounderAccountDetail('${p.user_id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFounderAccountDetail('${p.user_id}')}" title="View account activity"><div><strong>${escapeHtml(p.display_name||"AEGIS Pilot")}</strong><small>${escapeHtml(p.user_id)}</small></div><div><span class="activitytype">ACCOUNT · VIEW</span><small>Registered: ${p.created_at?new Date(p.created_at).toLocaleString():"Unknown"}</small></div><div><strong>Last active</strong><small>${p.last_seen_at?new Date(p.last_seen_at).toLocaleString():"No activity recorded"}</small></div></div>`).join("")||'<p class="muted">Belum ada akaun profil.</p>';
+ renderFounderActivityLog();
 }
 
 function switchView(view){
